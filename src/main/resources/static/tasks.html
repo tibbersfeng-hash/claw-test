@@ -43,6 +43,10 @@
         .status-INIT { background: #e6f7ff; color: #1890ff; }
         .status-IN_PROGRESS { background: #fff7e6; color: #fa8c16; }
         .status-COMPLETED { background: #f6ffed; color: #52c41a; }
+        .identity-type { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; margin-left: 6px; }
+        .identity-PM { background: #f0f5ff; color: #2f54eb; }
+        .identity-OPS { background: #fff1f0; color: #f5222d; }
+        .identity-DEV { background: #f6ffed; color: #52c41a; }
         .pagination { display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
         .pagination button { padding: 8px 15px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; }
         .pagination button:hover:not(:disabled) { background: #f5f5f5; }
@@ -208,7 +212,7 @@
                         <span class="status status-${task.status}">${getStatusText(task.status)}</span>
                     </div>
                     <div class="task-meta">
-                        <span>👤 ${escapeHtml(task.creator)}</span>
+                        <span>👤 ${escapeHtml(task.creator)}${getIdentityTypeBadge(task.creator)}</span>
                         <span>📅 ${formatDate(task.createdAt)}</span>
                     </div>
                     ${task.remark ? `<div class="task-remark">📝 ${escapeHtml(task.remark)}</div>` : ''}
@@ -234,6 +238,13 @@
 
         function goToPage(page) { currentPage = page; loadTasks(); }
         function getStatusText(status) { return { 'INIT': '初始化', 'IN_PROGRESS': '进行中', 'COMPLETED': '已完成' }[status] || status; }
+        function getIdentityTypeBadge(creator) {
+            if (!creator) return '';
+            const typeMap = { 'PM': '产品经理', 'OPS': '运维', 'DEV': '开发' };
+            const type = creator.split('-')[0];
+            const typeName = typeMap[type] || type;
+            return `<span class="identity-type identity-${type}">${typeName}</span>`;
+        }
         function formatDate(dateStr) { if (!dateStr) return ''; return new Date(dateStr).toLocaleString('zh-CN'); }
         function escapeHtml(text) { if (!text) return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
         function escapeJsString(text) { if (!text) return "''"; return "'" + text.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\n/g, '\\n').replace(/\r/g, '\\r') + "'"; }
