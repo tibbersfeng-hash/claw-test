@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>任务管理</title>
+    <title>身份管理</title>
     <style>
         * {
             margin: 0;
@@ -29,7 +29,21 @@
             text-align: center;
         }
 
-        /* 卡片样式 */
+        .nav {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .nav a {
+            color: #4a90d9;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        .nav a:hover {
+            text-decoration: underline;
+        }
+
         .card {
             background: white;
             border-radius: 8px;
@@ -47,7 +61,6 @@
             border-bottom: 1px solid #eee;
         }
 
-        /* 表单样式 */
         .form-group {
             margin-bottom: 15px;
         }
@@ -60,7 +73,7 @@
         }
 
         .form-group input,
-        .form-group textarea {
+        .form-group select {
             width: 100%;
             padding: 10px 12px;
             border: 1px solid #ddd;
@@ -70,17 +83,11 @@
         }
 
         .form-group input:focus,
-        .form-group textarea:focus {
+        .form-group select:focus {
             outline: none;
             border-color: #4a90d9;
         }
 
-        .form-group textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        /* 按钮样式 */
         .btn {
             padding: 10px 20px;
             border: none;
@@ -99,13 +106,13 @@
             background: #357abd;
         }
 
-        .btn-success {
-            background: #52c41a;
+        .btn-danger {
+            background: #ff4d4f;
             color: white;
         }
 
-        .btn-success:hover {
-            background: #389e0d;
+        .btn-danger:hover {
+            background: #d9363e;
         }
 
         .btn-warning {
@@ -122,7 +129,6 @@
             font-size: 12px;
         }
 
-        /* 筛选栏 */
         .filter-bar {
             display: flex;
             gap: 15px;
@@ -137,12 +143,11 @@
             font-size: 14px;
         }
 
-        /* 任务列表 */
-        .task-list {
+        .identity-list {
             list-style: none;
         }
 
-        .task-item {
+        .identity-item {
             padding: 15px;
             border: 1px solid #eee;
             border-radius: 6px;
@@ -150,28 +155,25 @@
             transition: all 0.2s;
         }
 
-        .task-item:hover {
+        .identity-item:hover {
             border-color: #ddd;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
-        .task-header {
+        .identity-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
             margin-bottom: 10px;
         }
 
-        .task-content {
+        .identity-name {
             font-size: 16px;
+            font-weight: 600;
             color: #333;
-            flex: 1;
-            margin-right: 10px;
-            white-space: pre-wrap;
-            word-break: break-word;
         }
 
-        .task-meta {
+        .identity-meta {
             display: flex;
             gap: 15px;
             font-size: 12px;
@@ -179,23 +181,44 @@
             margin-bottom: 10px;
         }
 
-        .task-remark {
-            font-size: 14px;
-            color: #666;
-            background: #f9f9f9;
-            padding: 8px 10px;
+        .api-key-box {
+            background: #f5f5f5;
+            padding: 10px;
             border-radius: 4px;
-            margin-top: 10px;
+            font-family: monospace;
+            font-size: 13px;
+            word-break: break-all;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
         }
 
-        .task-actions {
+        .api-key-box code {
+            flex: 1;
+        }
+
+        .copy-btn {
+            background: #4a90d9;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .copy-btn:hover {
+            background: #357abd;
+        }
+
+        .identity-actions {
             margin-top: 10px;
             display: flex;
             gap: 8px;
         }
 
-        /* 状态标签 */
-        .status {
+        .type-tag {
             display: inline-block;
             padding: 4px 10px;
             border-radius: 12px;
@@ -203,22 +226,21 @@
             font-weight: 500;
         }
 
-        .status-INIT {
+        .type-ADMIN {
+            background: #fff1f0;
+            color: #f5222d;
+        }
+
+        .type-USER {
             background: #e6f7ff;
             color: #1890ff;
         }
 
-        .status-IN_PROGRESS {
-            background: #fff7e6;
-            color: #fa8c16;
-        }
-
-        .status-COMPLETED {
+        .type-GUEST {
             background: #f6ffed;
             color: #52c41a;
         }
 
-        /* 分页 */
         .pagination {
             display: flex;
             justify-content: center;
@@ -248,14 +270,12 @@
             color: #666;
         }
 
-        /* 空状态 */
         .empty-state {
             text-align: center;
             padding: 40px;
             color: #999;
         }
 
-        /* 模态框 */
         .modal {
             display: none;
             position: fixed;
@@ -278,7 +298,7 @@
             padding: 20px;
             border-radius: 8px;
             width: 90%;
-            max-width: 500px;
+            max-width: 400px;
         }
 
         .modal-header {
@@ -303,7 +323,6 @@
             background: #e8e8e8;
         }
 
-        /* 消息提示 */
         .toast {
             position: fixed;
             top: 20px;
@@ -329,93 +348,74 @@
 </head>
 <body>
     <div class="container">
-        <h1>📋 任务管理</h1>
+        <h1>🔐 身份管理</h1>
 
-        <div class="nav" style="margin-bottom: 20px; text-align: center;">
-            <a href="/tasks.html" style="color: #4a90d9; text-decoration: none; margin: 0 10px;">任务管理</a>
-            <a href="/identities.html" style="color: #4a90d9; text-decoration: none; margin: 0 10px;">身份管理</a>
+        <div class="nav">
+            <a href="/tasks.html">任务管理</a>
+            <a href="/identities.html">身份管理</a>
         </div>
 
-        <!-- 创建任务 -->
+        <!-- 创建身份 -->
         <div class="card">
-            <div class="card-title">创建任务</div>
+            <div class="card-title">创建身份</div>
             <form id="createForm">
                 <div class="form-group">
-                    <label for="content">任务内容</label>
-                    <textarea id="content" placeholder="请输入任务内容（支持多行）" required maxlength="1000"></textarea>
+                    <label for="name">身份名称</label>
+                    <input type="text" id="name" placeholder="请输入身份名称" required maxlength="100">
                 </div>
                 <div class="form-group">
-                    <label for="creator">创建人</label>
-                    <input type="text" id="creator" placeholder="请输入创建人" required maxlength="100">
+                    <label for="type">身份类型</label>
+                    <select id="type" required>
+                        <option value="">请选择类型</option>
+                        <option value="ADMIN">管理员 (ADMIN)</option>
+                        <option value="USER">用户 (USER)</option>
+                        <option value="GUEST">访客 (GUEST)</option>
+                    </select>
                 </div>
-                <button type="submit" class="btn btn-primary">创建任务</button>
+                <button type="submit" class="btn btn-primary">创建身份</button>
             </form>
         </div>
 
-        <!-- 任务列表 -->
+        <!-- 身份列表 -->
         <div class="card">
-            <div class="card-title">任务列表</div>
+            <div class="card-title">身份列表</div>
 
-            <!-- 筛选栏 -->
             <div class="filter-bar">
-                <label>状态筛选：</label>
-                <select id="statusFilter">
+                <label>类型筛选：</label>
+                <select id="typeFilter">
                     <option value="">全部</option>
-                    <option value="INIT">初始化</option>
-                    <option value="IN_PROGRESS">进行中</option>
-                    <option value="COMPLETED">已完成</option>
+                    <option value="ADMIN">管理员</option>
+                    <option value="USER">用户</option>
+                    <option value="GUEST">访客</option>
                 </select>
             </div>
 
-            <!-- 任务列表 -->
-            <ul class="task-list" id="taskList"></ul>
+            <ul class="identity-list" id="identityList"></ul>
 
-            <!-- 分页 -->
             <div class="pagination" id="pagination"></div>
         </div>
     </div>
 
-    <!-- 修改任务模态框 -->
-    <div class="modal" id="editModal">
+    <!-- 删除确认模态框 -->
+    <div class="modal" id="deleteModal">
         <div class="modal-content">
-            <div class="modal-header">修改任务内容</div>
-            <div class="form-group">
-                <label for="editContent">任务内容</label>
-                <textarea id="editContent" placeholder="请输入任务内容（支持多行）" maxlength="1000"></textarea>
-            </div>
+            <div class="modal-header">确认删除</div>
+            <p>确定要删除该身份吗？此操作不可恢复。</p>
             <div class="modal-actions">
-                <button class="btn btn-cancel" onclick="closeEditModal()">取消</button>
-                <button class="btn btn-primary" onclick="confirmEdit()">保存</button>
+                <button class="btn btn-cancel" onclick="closeDeleteModal()">取消</button>
+                <button class="btn btn-danger" onclick="confirmDelete()">确认删除</button>
             </div>
         </div>
     </div>
 
-    <!-- 完成任务模态框 -->
-    <div class="modal" id="completeModal">
-        <div class="modal-content">
-            <div class="modal-header">完成任务</div>
-            <div class="form-group">
-                <label for="remark">完成备注</label>
-                <textarea id="remark" placeholder="请输入完成备注（可选）" maxlength="500"></textarea>
-            </div>
-            <div class="modal-actions">
-                <button class="btn btn-cancel" onclick="closeCompleteModal()">取消</button>
-                <button class="btn btn-success" onclick="confirmComplete()">确认完成</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 消息提示 -->
     <div class="toast" id="toast"></div>
 
     <script>
-        const API_BASE = '/api/tasks';
+        const API_BASE = '/api/identities';
         let currentPage = 0;
-        let currentStatus = '';
-        let totalPages = 0;
-        let currentTaskId = null;
+        let currentType = '';
+        let currentIdentityId = null;
 
-        // 显示消息
         function showToast(message, isError = false) {
             const toast = document.getElementById('toast');
             toast.textContent = message;
@@ -425,59 +425,54 @@
             }, 3000);
         }
 
-        // 加载任务列表
-        async function loadTasks() {
-            const statusFilter = document.getElementById('statusFilter').value;
-            currentStatus = statusFilter;
+        async function loadIdentities() {
+            const typeFilter = document.getElementById('typeFilter').value;
+            currentType = typeFilter;
 
             let url = `${API_BASE}?page=${currentPage}&size=10`;
-            if (statusFilter) {
-                url += `&status=${statusFilter}`;
+            if (typeFilter) {
+                url += `&type=${typeFilter}`;
             }
 
             try {
                 const response = await fetch(url);
                 const data = await response.json();
-
-                totalPages = data.totalPages;
-                renderTasks(data.content);
+                renderIdentities(data.content);
                 renderPagination(data.totalElements, data.totalPages, data.number);
             } catch (error) {
-                showToast('加载任务列表失败', true);
+                showToast('加载身份列表失败', true);
             }
         }
 
-        // 渲染任务列表
-        function renderTasks(tasks) {
-            const taskList = document.getElementById('taskList');
+        function renderIdentities(identities) {
+            const identityList = document.getElementById('identityList');
 
-            if (tasks.length === 0) {
-                taskList.innerHTML = '<div class="empty-state">暂无任务</div>';
+            if (identities.length === 0) {
+                identityList.innerHTML = '<div class="empty-state">暂无身份</div>';
                 return;
             }
 
-            taskList.innerHTML = tasks.map(task => `
-                <li class="task-item">
-                    <div class="task-header">
-                        <div class="task-content">${escapeHtml(task.content)}</div>
-                        <span class="status status-${task.status}">${getStatusText(task.status)}</span>
+            identityList.innerHTML = identities.map(identity => `
+                <li class="identity-item">
+                    <div class="identity-header">
+                        <span class="identity-name">${escapeHtml(identity.name)}</span>
+                        <span class="type-tag type-${identity.type}">${getTypeText(identity.type)}</span>
                     </div>
-                    <div class="task-meta">
-                        <span>👤 ${escapeHtml(task.creator)}</span>
-                        <span>📅 ${formatDate(task.createdAt)}</span>
+                    <div class="identity-meta">
+                        <span>📅 ${formatDate(identity.createdAt)}</span>
                     </div>
-                    ${task.remark ? `<div class="task-remark">📝 ${escapeHtml(task.remark)}</div>` : ''}
-                    <div class="task-actions">
-                        <button class="btn btn-warning btn-sm" onclick="openEditModal(${task.id}, ${escapeJsString(task.content)})">修改内容</button>
-                        ${task.status !== 'COMPLETED' ? `
-                            <button class="btn btn-success btn-sm" onclick="openCompleteModal(${task.id})">完成任务</button>
-                        ` : ''}
+                    <div class="api-key-box">
+                        <code>${identity.apiKey}</code>
+                        <button class="copy-btn" onclick="copyApiKey('${identity.apiKey}')">复制</button>
+                    </div>
+                    <div class="identity-actions">
+                        <button class="btn btn-warning btn-sm" onclick="regenerateKey(${identity.id})">重新生成 Key</button>
+                        <button class="btn btn-danger btn-sm" onclick="openDeleteModal(${identity.id})">删除</button>
                     </div>
                 </li>
             `).join('');
         }
 
-        // 渲染分页
         function renderPagination(total, pages, current) {
             const pagination = document.getElementById('pagination');
 
@@ -493,30 +488,26 @@
             `;
         }
 
-        // 跳转页面
         function goToPage(page) {
             currentPage = page;
-            loadTasks();
+            loadIdentities();
         }
 
-        // 状态文本
-        function getStatusText(status) {
+        function getTypeText(type) {
             const map = {
-                'INIT': '初始化',
-                'IN_PROGRESS': '进行中',
-                'COMPLETED': '已完成'
+                'ADMIN': '管理员',
+                'USER': '用户',
+                'GUEST': '访客'
             };
-            return map[status] || status;
+            return map[type] || type;
         }
 
-        // 格式化日期
         function formatDate(dateStr) {
             if (!dateStr) return '';
             const date = new Date(dateStr);
             return date.toLocaleString('zh-CN');
         }
 
-        // HTML 转义
         function escapeHtml(text) {
             if (!text) return '';
             const div = document.createElement('div');
@@ -524,20 +515,21 @@
             return div.innerHTML;
         }
 
-        // JS 字符串转义（用于 onclick 参数）
-        function escapeJsString(text) {
-            if (!text) return "''";
-            return "'" + text.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\n/g, '\\n').replace(/\r/g, '\\r') + "'";
+        function copyApiKey(key) {
+            navigator.clipboard.writeText(key).then(() => {
+                showToast('API Key 已复制到剪贴板');
+            }).catch(() => {
+                showToast('复制失败', true);
+            });
         }
 
-        // 创建任务
         document.getElementById('createForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const content = document.getElementById('content').value.trim();
-            const creator = document.getElementById('creator').value.trim();
+            const name = document.getElementById('name').value.trim();
+            const type = document.getElementById('type').value;
 
-            if (!content || !creator) {
+            if (!name || !type) {
                 showToast('请填写完整信息', true);
                 return;
             }
@@ -546,64 +538,37 @@
                 const response = await fetch(API_BASE, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ content, creator })
+                    body: JSON.stringify({ name, type })
                 });
 
                 if (response.ok) {
-                    showToast('任务创建成功');
+                    showToast('身份创建成功');
                     document.getElementById('createForm').reset();
                     currentPage = 0;
-                    loadTasks();
+                    loadIdentities();
                 } else {
                     const error = await response.json();
                     showToast(error.message || '创建失败', true);
                 }
             } catch (error) {
-                showToast('创建任务失败', true);
+                showToast('创建身份失败', true);
             }
         });
 
-        // 状态筛选变化
-        document.getElementById('statusFilter').addEventListener('change', () => {
+        document.getElementById('typeFilter').addEventListener('change', () => {
             currentPage = 0;
-            loadTasks();
+            loadIdentities();
         });
 
-        // 打开修改模态框
-        function openEditModal(taskId, content) {
-            currentTaskId = taskId;
-            document.getElementById('editContent').value = content || '';
-            document.getElementById('editModal').classList.add('active');
-        }
-
-        // 关闭修改模态框
-        function closeEditModal() {
-            document.getElementById('editModal').classList.remove('active');
-            currentTaskId = null;
-        }
-
-        // 确认修改
-        async function confirmEdit() {
-            if (!currentTaskId) return;
-
-            const content = document.getElementById('editContent').value.trim();
-
-            if (!content) {
-                showToast('任务内容不能为空', true);
-                return;
-            }
-
+        async function regenerateKey(id) {
             try {
-                const response = await fetch(`${API_BASE}/${currentTaskId}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ content })
+                const response = await fetch(`${API_BASE}/${id}/regenerate-key`, {
+                    method: 'POST'
                 });
 
                 if (response.ok) {
-                    showToast('任务内容已修改');
-                    closeEditModal();
-                    loadTasks();
+                    showToast('API Key 已重新生成');
+                    loadIdentities();
                 } else {
                     const error = await response.json();
                     showToast(error.message || '操作失败', true);
@@ -613,47 +578,38 @@
             }
         }
 
-        // 打开完成模态框
-        function openCompleteModal(taskId) {
-            currentTaskId = taskId;
-            document.getElementById('remark').value = '';
-            document.getElementById('completeModal').classList.add('active');
+        function openDeleteModal(id) {
+            currentIdentityId = id;
+            document.getElementById('deleteModal').classList.add('active');
         }
 
-        // 关闭完成模态框
-        function closeCompleteModal() {
-            document.getElementById('completeModal').classList.remove('active');
-            currentTaskId = null;
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('active');
+            currentIdentityId = null;
         }
 
-        // 确认完成任务
-        async function confirmComplete() {
-            if (!currentTaskId) return;
-
-            const remark = document.getElementById('remark').value.trim();
+        async function confirmDelete() {
+            if (!currentIdentityId) return;
 
             try {
-                const response = await fetch(`${API_BASE}/${currentTaskId}/complete`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ remark })
+                const response = await fetch(`${API_BASE}/${currentIdentityId}`, {
+                    method: 'DELETE'
                 });
 
                 if (response.ok) {
-                    showToast('任务已完成');
-                    closeCompleteModal();
-                    loadTasks();
+                    showToast('身份已删除');
+                    closeDeleteModal();
+                    loadIdentities();
                 } else {
                     const error = await response.json();
-                    showToast(error.message || '操作失败', true);
+                    showToast(error.message || '删除失败', true);
                 }
             } catch (error) {
-                showToast('操作失败', true);
+                showToast('删除失败', true);
             }
         }
 
-        // 初始化
-        loadTasks();
+        loadIdentities();
     </script>
 </body>
 </html>
