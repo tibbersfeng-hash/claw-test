@@ -87,4 +87,12 @@ public class TaskService {
         Task savedTask = taskRepository.save(task);
         return TaskResponse.fromEntity(savedTask);
     }
+
+    @Transactional
+    public void deleteTask(Long id) {
+        if (!taskRepository.existsById(id)) {
+            throw new TaskNotFoundException(id);
+        }
+        taskRepository.deleteById(id);
+    }
 }

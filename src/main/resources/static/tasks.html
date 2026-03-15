@@ -26,6 +26,8 @@
         .btn-success:hover { background: #389e0d; }
         .btn-warning { background: #fa8c16; color: white; }
         .btn-warning:hover { background: #d46b08; }
+        .btn-danger { background: #ff4d4f; color: white; }
+        .btn-danger:hover { background: #d9363e; }
         .btn-sm { padding: 6px 12px; font-size: 12px; }
         .filter-bar { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
         .filter-bar select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
@@ -137,6 +139,18 @@
         </div>
     </div>
 
+    <!-- 删除任务模态框 -->
+    <div class="modal" id="deleteModal">
+        <div class="modal-content">
+            <div class="modal-header">确认删除</div>
+            <p>确定要删除该任务吗？此操作不可恢复。</p>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="closeDeleteModal()">取消</button>
+                <button class="btn btn-danger" onclick="confirmDelete()">确认删除</button>
+            </div>
+        </div>
+    </div>
+
     <div class="toast" id="toast"></div>
 
     <script>
@@ -192,6 +206,7 @@
                     <div class="task-actions">
                         <button class="btn btn-warning btn-sm" onclick="openEditModal(${task.id}, ${escapeJsString(task.content)})">修改内容</button>
                         ${task.status !== 'COMPLETED' ? `<button class="btn btn-success btn-sm" onclick="openCompleteModal(${task.id})">完成任务</button>` : ''}
+                        <button class="btn btn-danger btn-sm" onclick="openDeleteModal(${task.id})">删除</button>
                     </div>
                 </li>
             `).join('');
@@ -272,6 +287,24 @@
                 if (response.ok) { showToast('任务已完成'); closeCompleteModal(); loadTasks(); }
                 else { const error = await response.json(); showToast(error.message || '操作失败', true); }
             } catch (error) { showToast('操作失败', true); }
+        }
+
+        function openDeleteModal(taskId) {
+            currentTaskId = taskId;
+            document.getElementById('deleteModal').classList.add('active');
+        }
+        function closeDeleteModal() { document.getElementById('deleteModal').classList.remove('active'); currentTaskId = null; }
+
+        async function confirmDelete() {
+            if (!currentTaskId) return;
+            try {
+                const response = await fetch(`${API_BASE}/${currentTaskId}`, {
+                    method: 'DELETE',
+                    headers: getHeaders()
+                });
+                if (response.ok) { showToast('任务已删除'); closeDeleteModal(); loadTasks(); }
+                else { const error = await response.json(); showToast(error.message || '删除失败', true); }
+            } catch (error) { showToast('删除失败', true); }
         }
 
         loadTasks();
