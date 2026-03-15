@@ -76,6 +76,21 @@ public class TaskService {
     }
 
     @Transactional
+    public TaskResponse startTask(Long id) {
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new TaskNotFoundException(id));
+
+        if (task.getStatus() == TaskStatus.COMPLETED) {
+            throw new IllegalStateException("任务已完成，无法标记进行中");
+        }
+
+        task.setStatus(TaskStatus.IN_PROGRESS);
+
+        Task savedTask = taskRepository.save(task);
+        return TaskResponse.fromEntity(savedTask);
+    }
+
+    @Transactional
     public TaskResponse updateTask(Long id, TaskUpdateRequest request) {
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new TaskNotFoundException(id));

@@ -205,6 +205,7 @@
                     ${task.remark ? `<div class="task-remark">📝 ${escapeHtml(task.remark)}</div>` : ''}
                     <div class="task-actions">
                         <button class="btn btn-warning btn-sm" onclick="openEditModal(${task.id}, ${escapeJsString(task.content)})">修改内容</button>
+                        ${task.status === 'INIT' ? `<button class="btn btn-primary btn-sm" onclick="startTask(${task.id})">开始任务</button>` : ''}
                         ${task.status !== 'COMPLETED' ? `<button class="btn btn-success btn-sm" onclick="openCompleteModal(${task.id})">完成任务</button>` : ''}
                         <button class="btn btn-danger btn-sm" onclick="openDeleteModal(${task.id})">删除</button>
                     </div>
@@ -285,6 +286,17 @@
                     body: JSON.stringify({ remark })
                 });
                 if (response.ok) { showToast('任务已完成'); closeCompleteModal(); loadTasks(); }
+                else { const error = await response.json(); showToast(error.message || '操作失败', true); }
+            } catch (error) { showToast('操作失败', true); }
+        }
+
+        async function startTask(taskId) {
+            try {
+                const response = await fetch(`${API_BASE}/${taskId}/start`, {
+                    method: 'PUT',
+                    headers: getHeaders()
+                });
+                if (response.ok) { showToast('任务已开始'); loadTasks(); }
                 else { const error = await response.json(); showToast(error.message || '操作失败', true); }
             } catch (error) { showToast('操作失败', true); }
         }

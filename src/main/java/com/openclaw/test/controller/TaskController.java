@@ -53,6 +53,12 @@ public class TaskController {
         return ResponseEntity.ok(response);
     }
 
+    @PutMapping("/{id}/start")
+    public ResponseEntity<TaskResponse> startTask(@PathVariable Long id) {
+        TaskResponse response = taskService.startTask(id);
+        return ResponseEntity.ok(response);
+    }
+
     @PutMapping("/{id}/complete")
     public ResponseEntity<TaskResponse> completeTask(
             @PathVariable Long id,
