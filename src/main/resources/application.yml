@@ -4,3 +4,15 @@ server:
 spring:
   application:
     name: claw-test
+
+logging:
+  level:
+    root: INFO
+    com.openclaw: DEBUG
+  file:
+    name: /tmp/claw-test/claw-test.log
+    max-size: 10MB
+    max-history: 30
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
