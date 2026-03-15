@@ -3,6 +3,7 @@ package com.openclaw.test.service;
 import com.openclaw.test.dto.TaskCompleteRequest;
 import com.openclaw.test.dto.TaskCreateRequest;
 import com.openclaw.test.dto.TaskResponse;
+import com.openclaw.test.dto.TaskUpdateRequest;
 import com.openclaw.test.entity.Task;
 import com.openclaw.test.entity.TaskStatus;
 import com.openclaw.test.exception.TaskNotFoundException;
@@ -63,6 +64,19 @@ public class TaskService {
 
         task.setStatus(TaskStatus.COMPLETED);
         task.setRemark(request.getRemark());
+
+        Task savedTask = taskRepository.save(task);
+        return TaskResponse.fromEntity(savedTask);
+    }
+
+    @Transactional
+    public TaskResponse updateTask(Long id, TaskUpdateRequest request) {
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new TaskNotFoundException(id));
+
+        if (request.getContent() != null && !request.getContent().trim().isEmpty()) {
+            task.setContent(request.getContent());
+        }
 
         Task savedTask = taskRepository.save(task);
         return TaskResponse.fromEntity(savedTask);

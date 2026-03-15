@@ -3,6 +3,7 @@ package com.openclaw.test.controller;
 import com.openclaw.test.dto.TaskCompleteRequest;
 import com.openclaw.test.dto.TaskCreateRequest;
 import com.openclaw.test.dto.TaskResponse;
+import com.openclaw.test.dto.TaskUpdateRequest;
 import com.openclaw.test.entity.TaskStatus;
 import com.openclaw.test.service.TaskService;
 import jakarta.validation.Valid;
@@ -53,6 +54,14 @@ public class TaskController {
             @PathVariable Long id,
             @Valid @RequestBody TaskCompleteRequest request) {
         TaskResponse response = taskService.completeTask(id, request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<TaskResponse> updateTask(
+            @PathVariable Long id,
+            @Valid @RequestBody TaskUpdateRequest request) {
+        TaskResponse response = taskService.updateTask(id, request);
         return ResponseEntity.ok(response);
     }
 }
