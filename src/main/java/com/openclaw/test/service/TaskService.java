@@ -137,6 +137,10 @@ public class TaskService {
             task.setContent(request.getContent());
         }
 
+        if (request.getProjectId() != null) {
+            task.setProjectId(request.getProjectId());
+        }
+
         Task savedTask = taskRepository.save(task);
         return fillProjectName(TaskResponse.fromEntity(savedTask));
     }
