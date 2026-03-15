@@ -9,6 +9,7 @@ import com.openclaw.test.entity.IdentityType;
 import com.openclaw.test.entity.Task;
 import com.openclaw.test.entity.TaskStatus;
 import com.openclaw.test.exception.TaskNotFoundException;
+import com.openclaw.test.repository.IdentityRepository;
 import com.openclaw.test.repository.TaskRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,9 +21,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class TaskService {
 
     private final TaskRepository taskRepository;
+    private final IdentityRepository identityRepository;
 
-    public TaskService(TaskRepository taskRepository) {
+    public TaskService(TaskRepository taskRepository, IdentityRepository identityRepository) {
         this.taskRepository = taskRepository;
+        this.identityRepository = identityRepository;
     }
 
     @Transactional
@@ -31,6 +34,12 @@ public class TaskService {
         task.setContent(request.getContent());
         task.setCreator(getCreatorName(identity));
         task.setStatus(TaskStatus.INIT);
+
+        // PM创建的任务，自动分配DEV作为处理人
+        if (identity.getType() == IdentityType.PM) {
+            identityRepository.findFirstByTypeOrderByIdAsc(IdentityType.DEV)
+                    .ifPresent(dev -> task.setHandler(getCreatorName(dev)));
+        }
 
         Task savedTask = taskRepository.save(task);
         return TaskResponse.fromEntity(savedTask);

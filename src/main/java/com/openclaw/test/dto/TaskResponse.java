@@ -10,6 +10,7 @@ public class TaskResponse {
     private Long id;
     private String content;
     private String creator;
+    private String handler;
     private TaskStatus status;
     private String remark;
     private LocalDateTime createdAt;
@@ -20,6 +21,7 @@ public class TaskResponse {
         response.setId(task.getId());
         response.setContent(task.getContent());
         response.setCreator(task.getCreator());
+        response.setHandler(task.getHandler());
         response.setStatus(task.getStatus());
         response.setRemark(task.getRemark());
         response.setCreatedAt(task.getCreatedAt());
@@ -49,6 +51,14 @@ public class TaskResponse {
 
     public void setCreator(String creator) {
         this.creator = creator;
+    }
+
+    public String getHandler() {
+        return handler;
+    }
+
+    public void setHandler(String handler) {
+        this.handler = handler;
     }
 
     public TaskStatus getStatus() {

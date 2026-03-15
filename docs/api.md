@@ -191,6 +191,7 @@ X-API-Key: sk-xxx
   "id": 1,
   "content": "完成项目文档编写\n支持多行内容",
   "creator": "PM-1",
+  "handler": "DEV-1",
   "status": "INIT",
   "remark": null,
   "createdAt": "2026-03-15T17:30:52.156",
@@ -201,6 +202,7 @@ X-API-Key: sk-xxx
 **说明**
 
 - `creator` 自动根据身份生成，格式：`{类型}-{ID}`，如 `PM-1`、`DEV-2`
+- `handler` 当前处理人，PM创建任务时自动分配第一个DEV身份作为处理人
 
 ---
 
@@ -231,6 +233,7 @@ X-API-Key: sk-xxx
       "id": 1,
       "content": "任务内容",
       "creator": "PM-1",
+      "handler": "DEV-1",
       "status": "INIT",
       "remark": null,
       "createdAt": "2026-03-15T17:30:52.156",
@@ -307,6 +310,7 @@ X-API-Key: sk-xxx
   "id": 1,
   "content": "任务内容",
   "creator": "PM-1",
+  "handler": "DEV-1",
   "status": "IN_PROGRESS",
   "remark": null,
   "createdAt": "2026-03-15T17:30:52.156",
@@ -356,6 +360,7 @@ X-API-Key: sk-xxx
   "id": 1,
   "content": "任务内容",
   "creator": "PM-1",
+  "handler": "DEV-1",
   "status": "COMPLETED",
   "remark": "任务已完成，测试通过",
   "createdAt": "2026-03-15T17:30:52.156",
@@ -408,6 +413,7 @@ X-API-Key: sk-xxx
 | id | long | 主键 |
 | content | string | 任务内容 |
 | creator | string | 创建人，格式：{类型}-{ID} |
+| handler | string | 当前处理人，格式：{类型}-{ID} |
 | status | string | 状态：INIT / IN_PROGRESS / COMPLETED |
 | remark | string | 完成备注 |
 | createdAt | datetime | 创建时间 |

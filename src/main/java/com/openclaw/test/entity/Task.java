@@ -17,6 +17,9 @@ public class Task {
     @Column(nullable = false, length = 100)
     private String creator;
 
+    @Column(length = 100)
+    private String handler;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TaskStatus status = TaskStatus.INIT;
@@ -64,6 +67,14 @@ public class Task {
 
     public void setCreator(String creator) {
         this.creator = creator;
+    }
+
+    public String getHandler() {
+        return handler;
+    }
+
+    public void setHandler(String handler) {
+        this.handler = handler;
     }
 
     public TaskStatus getStatus() {

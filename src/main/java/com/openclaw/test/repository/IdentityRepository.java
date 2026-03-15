@@ -17,4 +17,6 @@ public interface IdentityRepository extends JpaRepository<Identity, Long> {
     Page<Identity> findByType(IdentityType type, Pageable pageable);
 
     boolean existsByApiKey(String apiKey);
+
+    Optional<Identity> findFirstByTypeOrderByIdAsc(IdentityType type);
 }

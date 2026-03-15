@@ -213,6 +213,7 @@
                     </div>
                     <div class="task-meta">
                         <span>👤 ${escapeHtml(task.creator)}${getIdentityTypeBadge(task.creator)}</span>
+                        ${task.handler ? `<span>🔧 ${escapeHtml(task.handler)}${getIdentityTypeBadge(task.handler)}</span>` : ''}
                         <span>📅 ${formatDate(task.createdAt)}</span>
                     </div>
                     ${task.remark ? `<div class="task-remark">📝 ${escapeHtml(task.remark)}</div>` : ''}
