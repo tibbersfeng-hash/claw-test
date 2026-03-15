@@ -93,6 +93,12 @@
                     <label for="content">任务内容</label>
                     <textarea id="content" placeholder="请输入任务内容（支持多行）" required maxlength="1000"></textarea>
                 </div>
+                <div class="form-group">
+                    <label for="projectId">关联项目</label>
+                    <select id="projectId">
+                        <option value="">无</option>
+                    </select>
+                </div>
                 <button type="submit" class="btn btn-primary">创建任务</button>
             </form>
         </div>
@@ -224,6 +230,7 @@
                     <div class="task-meta">
                         <span>👤 ${escapeHtml(task.creator)}${getIdentityTypeBadge(task.creator)}</span>
                         ${task.handler ? `<span>🔧 ${escapeHtml(task.handler)}${getIdentityTypeBadge(task.handler)}</span>` : ''}
+                        ${task.projectName ? `<span>📁 ${escapeHtml(task.projectName)}</span>` : ''}
                         <span>📅 ${formatDate(task.createdAt)}</span>
                     </div>
                     ${task.remark ? `<div class="task-remark">📝 ${escapeHtml(task.remark)}</div>` : ''}
@@ -263,15 +270,18 @@
         document.getElementById('createForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const content = document.getElementById('content').value.trim();
+            const projectId = document.getElementById('projectId').value;
             if (!content) { showToast('请填写任务内容', true); return; }
             if (!getApiKey()) { showToast('请先输入 API Key', true); return; }
             try {
+                const body = { content };
+                if (projectId) body.projectId = parseInt(projectId);
                 const response = await fetch(API_BASE, {
                     method: 'POST',
                     headers: getHeaders(),
-                    body: JSON.stringify({ content })
+                    body: JSON.stringify(body)
                 });
-                if (response.ok) { showToast('任务创建成功'); document.getElementById('createForm').reset(); currentPage = 0; loadTasks(); }
+                if (response.ok) { showToast('任务创建成功'); document.getElementById('createForm').reset(); loadProjects(); currentPage = 0; loadTasks(); }
                 else { const error = await response.json(); showToast(error.message || '创建失败', true); }
             } catch (error) { showToast('创建任务失败', true); }
         });
@@ -354,6 +364,16 @@
             } catch (error) { showToast('删除失败', true); }
         }
 
+        async function loadProjects() {
+            try {
+                const response = await fetch('/api/projects?size=100');
+                const data = await response.json();
+                const select = document.getElementById('projectId');
+                select.innerHTML = '<option value="">无</option>' + data.content.map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
+            } catch (error) { console.error('加载项目列表失败'); }
+        }
+
+        loadProjects();
         loadTasks();
     </script>
 </body>

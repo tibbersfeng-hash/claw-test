@@ -11,6 +11,8 @@ public class TaskResponse {
     private String content;
     private String creator;
     private String handler;
+    private Long projectId;
+    private String projectName;
     private TaskStatus status;
     private String remark;
     private LocalDateTime createdAt;
@@ -22,6 +24,7 @@ public class TaskResponse {
         response.setContent(task.getContent());
         response.setCreator(task.getCreator());
         response.setHandler(task.getHandler());
+        response.setProjectId(task.getProjectId());
         response.setStatus(task.getStatus());
         response.setRemark(task.getRemark());
         response.setCreatedAt(task.getCreatedAt());
@@ -59,6 +62,22 @@ public class TaskResponse {
 
     public void setHandler(String handler) {
         this.handler = handler;
+    }
+
+    public Long getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(Long projectId) {
+        this.projectId = projectId;
+    }
+
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
     }
 
     public TaskStatus getStatus() {

@@ -6,10 +6,12 @@ import com.openclaw.test.dto.TaskResponse;
 import com.openclaw.test.dto.TaskUpdateRequest;
 import com.openclaw.test.entity.Identity;
 import com.openclaw.test.entity.IdentityType;
+import com.openclaw.test.entity.Project;
 import com.openclaw.test.entity.Task;
 import com.openclaw.test.entity.TaskStatus;
 import com.openclaw.test.exception.TaskNotFoundException;
 import com.openclaw.test.repository.IdentityRepository;
+import com.openclaw.test.repository.ProjectRepository;
 import com.openclaw.test.repository.TaskRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,10 +24,12 @@ public class TaskService {
 
     private final TaskRepository taskRepository;
     private final IdentityRepository identityRepository;
+    private final ProjectRepository projectRepository;
 
-    public TaskService(TaskRepository taskRepository, IdentityRepository identityRepository) {
+    public TaskService(TaskRepository taskRepository, IdentityRepository identityRepository, ProjectRepository projectRepository) {
         this.taskRepository = taskRepository;
         this.identityRepository = identityRepository;
+        this.projectRepository = projectRepository;
     }
 
     @Transactional
@@ -33,6 +37,7 @@ public class TaskService {
         Task task = new Task();
         task.setContent(request.getContent());
         task.setCreator(getCreatorName(identity));
+        task.setProjectId(request.getProjectId());
         task.setStatus(TaskStatus.INIT);
 
         // PM创建的任务，自动分配DEV作为处理人
@@ -42,11 +47,19 @@ public class TaskService {
         }
 
         Task savedTask = taskRepository.save(task);
-        return TaskResponse.fromEntity(savedTask);
+        return fillProjectName(TaskResponse.fromEntity(savedTask));
     }
 
     private String getCreatorName(Identity identity) {
         return identity.getType().name() + "-" + identity.getId();
+    }
+
+    private TaskResponse fillProjectName(TaskResponse response) {
+        if (response.getProjectId() != null) {
+            projectRepository.findById(response.getProjectId())
+                    .ifPresent(project -> response.setProjectName(project.getName()));
+        }
+        return response;
     }
 
     public Page<TaskResponse> getTasks(int page, int size, TaskStatus status, IdentityType creatorType, IdentityType handlerType) {
@@ -75,13 +88,13 @@ public class TaskService {
             taskPage = taskRepository.findAll(pageable);
         }
 
-        return taskPage.map(TaskResponse::fromEntity);
+        return taskPage.map(task -> fillProjectName(TaskResponse.fromEntity(task)));
     }
 
     public TaskResponse getTaskById(Long id) {
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new TaskNotFoundException(id));
-        return TaskResponse.fromEntity(task);
+        return fillProjectName(TaskResponse.fromEntity(task));
     }
 
     @Transactional
@@ -97,7 +110,7 @@ public class TaskService {
         task.setRemark(request.getRemark());
 
         Task savedTask = taskRepository.save(task);
-        return TaskResponse.fromEntity(savedTask);
+        return fillProjectName(TaskResponse.fromEntity(savedTask));
     }
 
     @Transactional
@@ -112,7 +125,7 @@ public class TaskService {
         task.setStatus(TaskStatus.IN_PROGRESS);
 
         Task savedTask = taskRepository.save(task);
-        return TaskResponse.fromEntity(savedTask);
+        return fillProjectName(TaskResponse.fromEntity(savedTask));
     }
 
     @Transactional
@@ -125,7 +138,7 @@ public class TaskService {
         }
 
         Task savedTask = taskRepository.save(task);
-        return TaskResponse.fromEntity(savedTask);
+        return fillProjectName(TaskResponse.fromEntity(savedTask));
     }
 
     @Transactional

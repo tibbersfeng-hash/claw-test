@@ -20,6 +20,8 @@ public class Task {
     @Column(length = 100)
     private String handler;
 
+    private Long projectId;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TaskStatus status = TaskStatus.INIT;
@@ -75,6 +77,14 @@ public class Task {
 
     public void setHandler(String handler) {
         this.handler = handler;
+    }
+
+    public Long getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(Long projectId) {
+        this.projectId = projectId;
     }
 
     public TaskStatus getStatus() {
