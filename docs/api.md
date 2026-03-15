@@ -2,7 +2,7 @@
 
 ## 概述
 
-- **Base URL**: `http://localhost:8080`
+- **Base URL**: `http://172.25.0.48:8080`
 - **认证方式**: 任务管理接口需要在请求头中携带 `X-API-Key`
 - **数据格式**: JSON
 
@@ -459,27 +459,27 @@ X-API-Key: sk-xxx
 
 ```bash
 # 1. 创建身份
-curl -X POST http://localhost:8080/api/identities \
+curl -X POST http://172.25.0.48:8080/api/identities \
   -H "Content-Type: application/json" \
   -d '{"type": "PM"}'
 
 # 2. 创建任务
-curl -X POST http://localhost:8080/api/tasks \
+curl -X POST http://172.25.0.48:8080/api/tasks \
   -H "Content-Type: application/json" \
   -H "X-API-Key: sk-xxx" \
   -d '{"content": "完成项目文档"}'
 
 # 3. 查询任务列表
-curl http://localhost:8080/api/tasks \
+curl http://172.25.0.48:8080/api/tasks \
   -H "X-API-Key: sk-xxx"
 
 # 4. 完成任务
-curl -X PUT http://localhost:8080/api/tasks/1/complete \
+curl -X PUT http://172.25.0.48:8080/api/tasks/1/complete \
   -H "Content-Type: application/json" \
   -H "X-API-Key: sk-xxx" \
   -d '{"remark": "已完成"}'
 
 # 5. 删除任务
-curl -X DELETE http://localhost:8080/api/tasks/1 \
+curl -X DELETE http://172.25.0.48:8080/api/tasks/1 \
   -H "X-API-Key: sk-xxx"
 ```

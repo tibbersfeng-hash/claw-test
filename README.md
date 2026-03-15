@@ -32,8 +32,8 @@ mvn spring-boot:run
 ```
 
 服务启动后访问：
-- 任务管理页面：http://localhost:8080/tasks.html
-- 身份管理页面：http://localhost:8080/identities.html
+- 任务管理页面：http://172.25.0.48:8080/tasks.html
+- 身份管理页面：http://172.25.0.48:8080/identities.html
 
 ## API 文档
 
@@ -43,18 +43,18 @@ mvn spring-boot:run
 
 ```bash
 # 1. 创建身份获取 API Key
-curl -X POST http://localhost:8080/api/identities \
+curl -X POST http://172.25.0.48:8080/api/identities \
   -H "Content-Type: application/json" \
   -d '{"type": "PM"}'
 
 # 2. 使用 API Key 创建任务
-curl -X POST http://localhost:8080/api/tasks \
+curl -X POST http://172.25.0.48:8080/api/tasks \
   -H "Content-Type: application/json" \
   -H "X-API-Key: sk-xxx" \
   -d '{"content": "完成项目文档"}'
 
 # 3. 查询任务列表
-curl http://localhost:8080/api/tasks \
+curl http://172.25.0.48:8080/api/tasks \
   -H "X-API-Key: sk-xxx"
 ```
 
