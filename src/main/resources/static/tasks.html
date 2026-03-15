@@ -103,8 +103,13 @@
                     <option value="IN_PROGRESS">进行中</option>
                     <option value="COMPLETED">已完成</option>
                 </select>
-                <label style="margin-left: 15px;">创建者筛选：</label>
-                <input type="text" id="creatorFilter" placeholder="输入创建者（如 PM-1）" style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; width: 150px;">
+                <label style="margin-left: 15px;">身份类型筛选：</label>
+                <select id="identityTypeFilter">
+                    <option value="">全部</option>
+                    <option value="PM">产品经理</option>
+                    <option value="OPS">运维</option>
+                    <option value="DEV">开发</option>
+                </select>
             </div>
             <ul class="task-list" id="taskList"></ul>
             <div class="pagination" id="pagination"></div>
@@ -179,11 +184,11 @@
 
         async function loadTasks() {
             const typeFilter = document.getElementById('statusFilter').value;
-            const creatorFilter = document.getElementById('creatorFilter').value.trim();
+            const identityTypeFilter = document.getElementById('identityTypeFilter').value;
             currentStatus = typeFilter;
             let url = `${API_BASE}?page=${currentPage}&size=10`;
             if (typeFilter) url += `&status=${typeFilter}`;
-            if (creatorFilter) url += `&creator=${encodeURIComponent(creatorFilter)}`;
+            if (identityTypeFilter) url += `&identityType=${identityTypeFilter}`;
             try {
                 const response = await fetch(url, { headers: getHeaders() });
                 if (response.status === 401) { showToast('请先输入有效的 API Key', true); return; }
@@ -251,9 +256,7 @@
 
         document.getElementById('statusFilter').addEventListener('change', () => { currentPage = 0; loadTasks(); });
 
-        document.getElementById('creatorFilter').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') { currentPage = 0; loadTasks(); }
-        });
+        document.getElementById('identityTypeFilter').addEventListener('change', () => { currentPage = 0; loadTasks(); });
 
         function openEditModal(taskId, content) {
             currentTaskId = taskId;

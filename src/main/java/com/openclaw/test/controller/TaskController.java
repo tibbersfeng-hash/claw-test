@@ -6,6 +6,7 @@ import com.openclaw.test.dto.TaskCreateRequest;
 import com.openclaw.test.dto.TaskResponse;
 import com.openclaw.test.dto.TaskUpdateRequest;
 import com.openclaw.test.entity.Identity;
+import com.openclaw.test.entity.IdentityType;
 import com.openclaw.test.entity.TaskStatus;
 import com.openclaw.test.service.TaskService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,12 +40,12 @@ public class TaskController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) TaskStatus status,
-            @RequestParam(required = false) String creator) {
+            @RequestParam(required = false) IdentityType identityType) {
 
         size = Math.min(size, 100);
         page = Math.max(page, 0);
 
-        Page<TaskResponse> response = taskService.getTasks(page, size, status, creator);
+        Page<TaskResponse> response = taskService.getTasks(page, size, status, identityType);
         return ResponseEntity.ok(response);
     }
 

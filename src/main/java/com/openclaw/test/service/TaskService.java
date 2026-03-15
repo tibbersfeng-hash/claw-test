@@ -40,19 +40,19 @@ public class TaskService {
         return identity.getType().name() + "-" + identity.getId();
     }
 
-    public Page<TaskResponse> getTasks(int page, int size, TaskStatus status, String creator) {
+    public Page<TaskResponse> getTasks(int page, int size, TaskStatus status, IdentityType identityType) {
         Pageable pageable = PageRequest.of(page, size);
 
         Page<Task> taskPage;
         boolean hasStatus = status != null;
-        boolean hasCreator = creator != null && !creator.trim().isEmpty();
+        boolean hasIdentityType = identityType != null;
 
-        if (hasStatus && hasCreator) {
-            taskPage = taskRepository.findByStatusAndCreatorContaining(status, creator.trim(), pageable);
+        if (hasStatus && hasIdentityType) {
+            taskPage = taskRepository.findByStatusAndCreatorStartingWith(status, identityType.name(), pageable);
         } else if (hasStatus) {
             taskPage = taskRepository.findByStatus(status, pageable);
-        } else if (hasCreator) {
-            taskPage = taskRepository.findByCreatorContaining(creator.trim(), pageable);
+        } else if (hasIdentityType) {
+            taskPage = taskRepository.findByCreatorStartingWith(identityType.name(), pageable);
         } else {
             taskPage = taskRepository.findAll(pageable);
         }
