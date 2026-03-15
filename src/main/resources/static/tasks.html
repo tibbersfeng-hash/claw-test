@@ -103,6 +103,8 @@
                     <option value="IN_PROGRESS">进行中</option>
                     <option value="COMPLETED">已完成</option>
                 </select>
+                <label style="margin-left: 15px;">创建者筛选：</label>
+                <input type="text" id="creatorFilter" placeholder="输入创建者（如 PM-1）" style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; width: 150px;">
             </div>
             <ul class="task-list" id="taskList"></ul>
             <div class="pagination" id="pagination"></div>
@@ -177,9 +179,11 @@
 
         async function loadTasks() {
             const typeFilter = document.getElementById('statusFilter').value;
+            const creatorFilter = document.getElementById('creatorFilter').value.trim();
             currentStatus = typeFilter;
             let url = `${API_BASE}?page=${currentPage}&size=10`;
             if (typeFilter) url += `&status=${typeFilter}`;
+            if (creatorFilter) url += `&creator=${encodeURIComponent(creatorFilter)}`;
             try {
                 const response = await fetch(url, { headers: getHeaders() });
                 if (response.status === 401) { showToast('请先输入有效的 API Key', true); return; }
@@ -246,6 +250,10 @@
         });
 
         document.getElementById('statusFilter').addEventListener('change', () => { currentPage = 0; loadTasks(); });
+
+        document.getElementById('creatorFilter').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') { currentPage = 0; loadTasks(); }
+        });
 
         function openEditModal(taskId, content) {
             currentTaskId = taskId;

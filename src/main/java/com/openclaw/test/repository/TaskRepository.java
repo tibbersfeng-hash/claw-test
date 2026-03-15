@@ -11,4 +11,8 @@ import org.springframework.stereotype.Repository;
 public interface TaskRepository extends JpaRepository<Task, Long> {
 
     Page<Task> findByStatus(TaskStatus status, Pageable pageable);
+
+    Page<Task> findByCreatorContaining(String creator, Pageable pageable);
+
+    Page<Task> findByStatusAndCreatorContaining(TaskStatus status, String creator, Pageable pageable);
 }
