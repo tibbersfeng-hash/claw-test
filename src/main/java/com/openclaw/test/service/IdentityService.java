@@ -24,7 +24,6 @@ public class IdentityService {
     @Transactional
     public IdentityResponse createIdentity(IdentityCreateRequest request) {
         Identity identity = new Identity();
-        identity.setName(request.getName());
         identity.setType(request.getType());
 
         Identity savedIdentity = identityRepository.save(identity);
@@ -48,6 +47,11 @@ public class IdentityService {
         Identity identity = identityRepository.findById(id)
                 .orElseThrow(() -> new IdentityNotFoundException(id));
         return IdentityResponse.fromEntity(identity);
+    }
+
+    public Identity getIdentityByApiKey(String apiKey) {
+        return identityRepository.findByApiKey(apiKey)
+                .orElseThrow(() -> new RuntimeException("无效的 API Key"));
     }
 
     @Transactional

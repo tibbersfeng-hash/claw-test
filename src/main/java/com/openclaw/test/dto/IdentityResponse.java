@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 public class IdentityResponse {
 
     private Long id;
-    private String name;
     private IdentityType type;
     private String apiKey;
     private LocalDateTime createdAt;
@@ -16,7 +15,6 @@ public class IdentityResponse {
     public static IdentityResponse fromEntity(Identity identity) {
         IdentityResponse response = new IdentityResponse();
         response.setId(identity.getId());
-        response.setName(identity.getName());
         response.setType(identity.getType());
         response.setApiKey(identity.getApiKey());
         response.setCreatedAt(identity.getCreatedAt());
@@ -29,14 +27,6 @@ public class IdentityResponse {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public IdentityType getType() {

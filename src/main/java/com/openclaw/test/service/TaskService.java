@@ -4,6 +4,8 @@ import com.openclaw.test.dto.TaskCompleteRequest;
 import com.openclaw.test.dto.TaskCreateRequest;
 import com.openclaw.test.dto.TaskResponse;
 import com.openclaw.test.dto.TaskUpdateRequest;
+import com.openclaw.test.entity.Identity;
+import com.openclaw.test.entity.IdentityType;
 import com.openclaw.test.entity.Task;
 import com.openclaw.test.entity.TaskStatus;
 import com.openclaw.test.exception.TaskNotFoundException;
@@ -24,14 +26,18 @@ public class TaskService {
     }
 
     @Transactional
-    public TaskResponse createTask(TaskCreateRequest request) {
+    public TaskResponse createTask(TaskCreateRequest request, Identity identity) {
         Task task = new Task();
         task.setContent(request.getContent());
-        task.setCreator(request.getCreator());
+        task.setCreator(getCreatorName(identity));
         task.setStatus(TaskStatus.INIT);
 
         Task savedTask = taskRepository.save(task);
         return TaskResponse.fromEntity(savedTask);
+    }
+
+    private String getCreatorName(Identity identity) {
+        return identity.getType().name() + "-" + identity.getId();
     }
 
     public Page<TaskResponse> getTasks(int page, int size, TaskStatus status) {

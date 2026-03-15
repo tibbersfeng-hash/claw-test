@@ -1,11 +1,14 @@
 package com.openclaw.test.controller;
 
+import com.openclaw.test.config.AuthInterceptor;
 import com.openclaw.test.dto.TaskCompleteRequest;
 import com.openclaw.test.dto.TaskCreateRequest;
 import com.openclaw.test.dto.TaskResponse;
 import com.openclaw.test.dto.TaskUpdateRequest;
+import com.openclaw.test.entity.Identity;
 import com.openclaw.test.entity.TaskStatus;
 import com.openclaw.test.service.TaskService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -23,8 +26,11 @@ public class TaskController {
     }
 
     @PostMapping
-    public ResponseEntity<TaskResponse> createTask(@Valid @RequestBody TaskCreateRequest request) {
-        TaskResponse response = taskService.createTask(request);
+    public ResponseEntity<TaskResponse> createTask(
+            @Valid @RequestBody TaskCreateRequest request,
+            HttpServletRequest httpRequest) {
+        Identity identity = (Identity) httpRequest.getAttribute(AuthInterceptor.IDENTITY_ATTRIBUTE);
+        TaskResponse response = taskService.createTask(request, identity);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -34,9 +40,7 @@ public class TaskController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) TaskStatus status) {
 
-        // 限制 size 最大为 100
         size = Math.min(size, 100);
-        // 确保 page >= 0
         page = Math.max(page, 0);
 
         Page<TaskResponse> response = taskService.getTasks(page, size, status);

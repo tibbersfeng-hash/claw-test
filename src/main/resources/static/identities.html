@@ -5,398 +5,101 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>身份管理</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: #f5f5f5;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        h1 {
-            color: #333;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .nav {
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .nav a {
-            color: #4a90d9;
-            text-decoration: none;
-            margin: 0 10px;
-        }
-
-        .nav a:hover {
-            text-decoration: underline;
-        }
-
-        .card {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .card-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: #666;
-            font-size: 14px;
-        }
-
-        .form-group input,
-        .form-group select {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-            transition: border-color 0.2s;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: #4a90d9;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.2s;
-        }
-
-        .btn-primary {
-            background: #4a90d9;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #357abd;
-        }
-
-        .btn-danger {
-            background: #ff4d4f;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #d9363e;
-        }
-
-        .btn-warning {
-            background: #fa8c16;
-            color: white;
-        }
-
-        .btn-warning:hover {
-            background: #d46b08;
-        }
-
-        .btn-sm {
-            padding: 6px 12px;
-            font-size: 12px;
-        }
-
-        .filter-bar {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .filter-bar select {
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-
-        .identity-list {
-            list-style: none;
-        }
-
-        .identity-item {
-            padding: 15px;
-            border: 1px solid #eee;
-            border-radius: 6px;
-            margin-bottom: 10px;
-            transition: all 0.2s;
-        }
-
-        .identity-item:hover {
-            border-color: #ddd;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-
-        .identity-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 10px;
-        }
-
-        .identity-name {
-            font-size: 16px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .identity-meta {
-            display: flex;
-            gap: 15px;
-            font-size: 12px;
-            color: #999;
-            margin-bottom: 10px;
-        }
-
-        .api-key-box {
-            background: #f5f5f5;
-            padding: 10px;
-            border-radius: 4px;
-            font-family: monospace;
-            font-size: 13px;
-            word-break: break-all;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .api-key-box code {
-            flex: 1;
-        }
-
-        .copy-btn {
-            background: #4a90d9;
-            color: white;
-            border: none;
-            padding: 4px 8px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-
-        .copy-btn:hover {
-            background: #357abd;
-        }
-
-        .identity-actions {
-            margin-top: 10px;
-            display: flex;
-            gap: 8px;
-        }
-
-        .type-tag {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .type-ADMIN {
-            background: #fff1f0;
-            color: #f5222d;
-        }
-
-        .type-USER {
-            background: #e6f7ff;
-            color: #1890ff;
-        }
-
-        .type-GUEST {
-            background: #f6ffed;
-            color: #52c41a;
-        }
-
-        .pagination {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .pagination button {
-            padding: 8px 15px;
-            border: 1px solid #ddd;
-            background: white;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .pagination button:hover:not(:disabled) {
-            background: #f5f5f5;
-        }
-
-        .pagination button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .pagination .page-info {
-            padding: 8px 15px;
-            color: #666;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px;
-            color: #999;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            width: 90%;
-            max-width: 400px;
-        }
-
-        .modal-header {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 15px;
-        }
-
-        .modal-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .btn-cancel {
-            background: #f5f5f5;
-            color: #666;
-        }
-
-        .btn-cancel:hover {
-            background: #e8e8e8;
-        }
-
-        .toast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 12px 20px;
-            background: #52c41a;
-            color: white;
-            border-radius: 4px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            transform: translateX(120%);
-            transition: transform 0.3s;
-            z-index: 1001;
-        }
-
-        .toast.show {
-            transform: translateX(0);
-        }
-
-        .toast.error {
-            background: #ff4d4f;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; min-height: 100vh; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; }
+        h1 { color: #333; margin-bottom: 20px; text-align: center; }
+        .nav { margin-bottom: 20px; text-align: center; }
+        .nav a { color: #4a90d9; text-decoration: none; margin: 0 10px; }
+        .nav a:hover { text-decoration: underline; }
+        .card { background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 20px; margin-bottom: 20px; }
+        .card-title { font-size: 18px; font-weight: 600; color: #333; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; color: #666; font-size: 14px; }
+        .form-group select { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+        .form-group select:focus { outline: none; border-color: #4a90d9; }
+        .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+        .btn-primary { background: #4a90d9; color: white; }
+        .btn-primary:hover { background: #357abd; }
+        .btn-danger { background: #ff4d4f; color: white; }
+        .btn-danger:hover { background: #d9363e; }
+        .btn-warning { background: #fa8c16; color: white; }
+        .btn-warning:hover { background: #d46b08; }
+        .btn-sm { padding: 6px 12px; font-size: 12px; }
+        .filter-bar { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; margin-bottom: 15px; }
+        .filter-bar select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+        .identity-list { list-style: none; }
+        .identity-item { padding: 15px; border: 1px solid #eee; border-radius: 6px; margin-bottom: 10px; }
+        .identity-item:hover { border-color: #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .identity-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .identity-id { font-size: 14px; color: #666; }
+        .api-key-box { background: #f5f5f5; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 13px; word-break: break-all; display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 10px; }
+        .api-key-box code { flex: 1; }
+        .copy-btn { background: #4a90d9; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .copy-btn:hover { background: #357abd; }
+        .identity-actions { margin-top: 10px; display: flex; gap: 8px; }
+        .type-tag { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+        .type-PM { background: #fff1f0; color: #f5222d; }
+        .type-OPS { background: #e6f7ff; color: #1890ff; }
+        .type-DEV { background: #f6ffed; color: #52c41a; }
+        .pagination { display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
+        .pagination button { padding: 8px 15px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; }
+        .pagination button:hover:not(:disabled) { background: #f5f5f5; }
+        .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .pagination .page-info { padding: 8px 15px; color: #666; }
+        .empty-state { text-align: center; padding: 40px; color: #999; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; padding: 20px; border-radius: 8px; width: 90%; max-width: 400px; }
+        .modal-header { font-size: 18px; font-weight: 600; margin-bottom: 15px; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+        .btn-cancel { background: #f5f5f5; color: #666; }
+        .btn-cancel:hover { background: #e8e8e8; }
+        .toast { position: fixed; top: 20px; right: 20px; padding: 12px 20px; background: #52c41a; color: white; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transform: translateX(120%); transition: transform 0.3s; z-index: 1001; }
+        .toast.show { transform: translateX(0); }
+        .toast.error { background: #ff4d4f; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🔐 身份管理</h1>
-
         <div class="nav">
             <a href="/tasks.html">任务管理</a>
             <a href="/identities.html">身份管理</a>
         </div>
 
-        <!-- 创建身份 -->
         <div class="card">
             <div class="card-title">创建身份</div>
             <form id="createForm">
                 <div class="form-group">
-                    <label for="name">身份名称</label>
-                    <input type="text" id="name" placeholder="请输入身份名称" required maxlength="100">
-                </div>
-                <div class="form-group">
                     <label for="type">身份类型</label>
                     <select id="type" required>
                         <option value="">请选择类型</option>
-                        <option value="ADMIN">管理员 (ADMIN)</option>
-                        <option value="USER">用户 (USER)</option>
-                        <option value="GUEST">访客 (GUEST)</option>
+                        <option value="PM">产品经理 (PM)</option>
+                        <option value="OPS">运维 (OPS)</option>
+                        <option value="DEV">开发 (DEV)</option>
                     </select>
                 </div>
                 <button type="submit" class="btn btn-primary">创建身份</button>
             </form>
         </div>
 
-        <!-- 身份列表 -->
         <div class="card">
             <div class="card-title">身份列表</div>
-
             <div class="filter-bar">
                 <label>类型筛选：</label>
                 <select id="typeFilter">
                     <option value="">全部</option>
-                    <option value="ADMIN">管理员</option>
-                    <option value="USER">用户</option>
-                    <option value="GUEST">访客</option>
+                    <option value="PM">产品经理</option>
+                    <option value="OPS">运维</option>
+                    <option value="DEV">开发</option>
                 </select>
             </div>
-
             <ul class="identity-list" id="identityList"></ul>
-
             <div class="pagination" id="pagination"></div>
         </div>
     </div>
 
-    <!-- 删除确认模态框 -->
     <div class="modal" id="deleteModal">
         <div class="modal-content">
             <div class="modal-header">确认删除</div>
@@ -420,46 +123,30 @@
             const toast = document.getElementById('toast');
             toast.textContent = message;
             toast.className = 'toast show' + (isError ? ' error' : '');
-            setTimeout(() => {
-                toast.className = 'toast';
-            }, 3000);
+            setTimeout(() => { toast.className = 'toast'; }, 3000);
         }
 
         async function loadIdentities() {
             const typeFilter = document.getElementById('typeFilter').value;
             currentType = typeFilter;
-
             let url = `${API_BASE}?page=${currentPage}&size=10`;
-            if (typeFilter) {
-                url += `&type=${typeFilter}`;
-            }
-
+            if (typeFilter) url += `&type=${typeFilter}`;
             try {
                 const response = await fetch(url);
                 const data = await response.json();
                 renderIdentities(data.content);
                 renderPagination(data.totalElements, data.totalPages, data.number);
-            } catch (error) {
-                showToast('加载身份列表失败', true);
-            }
+            } catch (error) { showToast('加载身份列表失败', true); }
         }
 
         function renderIdentities(identities) {
             const identityList = document.getElementById('identityList');
-
-            if (identities.length === 0) {
-                identityList.innerHTML = '<div class="empty-state">暂无身份</div>';
-                return;
-            }
-
+            if (identities.length === 0) { identityList.innerHTML = '<div class="empty-state">暂无身份</div>'; return; }
             identityList.innerHTML = identities.map(identity => `
                 <li class="identity-item">
                     <div class="identity-header">
-                        <span class="identity-name">${escapeHtml(identity.name)}</span>
+                        <span class="identity-id">ID: ${identity.id}</span>
                         <span class="type-tag type-${identity.type}">${getTypeText(identity.type)}</span>
-                    </div>
-                    <div class="identity-meta">
-                        <span>📅 ${formatDate(identity.createdAt)}</span>
                     </div>
                     <div class="api-key-box">
                         <code>${identity.apiKey}</code>
@@ -475,12 +162,7 @@
 
         function renderPagination(total, pages, current) {
             const pagination = document.getElementById('pagination');
-
-            if (pages <= 1) {
-                pagination.innerHTML = '';
-                return;
-            }
-
+            if (pages <= 1) { pagination.innerHTML = ''; return; }
             pagination.innerHTML = `
                 <button onclick="goToPage(${current - 1})" ${current === 0 ? 'disabled' : ''}>上一页</button>
                 <span class="page-info">第 ${current + 1} / ${pages} 页 (共 ${total} 条)</span>
@@ -488,125 +170,49 @@
             `;
         }
 
-        function goToPage(page) {
-            currentPage = page;
-            loadIdentities();
-        }
-
-        function getTypeText(type) {
-            const map = {
-                'ADMIN': '管理员',
-                'USER': '用户',
-                'GUEST': '访客'
-            };
-            return map[type] || type;
-        }
-
-        function formatDate(dateStr) {
-            if (!dateStr) return '';
-            const date = new Date(dateStr);
-            return date.toLocaleString('zh-CN');
-        }
-
-        function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
+        function goToPage(page) { currentPage = page; loadIdentities(); }
+        function getTypeText(type) { return { 'PM': '产品经理', 'OPS': '运维', 'DEV': '开发' }[type] || type; }
+        function escapeHtml(text) { if (!text) return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
 
         function copyApiKey(key) {
-            navigator.clipboard.writeText(key).then(() => {
-                showToast('API Key 已复制到剪贴板');
-            }).catch(() => {
-                showToast('复制失败', true);
-            });
+            navigator.clipboard.writeText(key).then(() => showToast('API Key 已复制到剪贴板')).catch(() => showToast('复制失败', true));
         }
 
         document.getElementById('createForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-
-            const name = document.getElementById('name').value.trim();
             const type = document.getElementById('type').value;
-
-            if (!name || !type) {
-                showToast('请填写完整信息', true);
-                return;
-            }
-
+            if (!type) { showToast('请选择身份类型', true); return; }
             try {
                 const response = await fetch(API_BASE, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, type })
+                    body: JSON.stringify({ type })
                 });
-
-                if (response.ok) {
-                    showToast('身份创建成功');
-                    document.getElementById('createForm').reset();
-                    currentPage = 0;
-                    loadIdentities();
-                } else {
-                    const error = await response.json();
-                    showToast(error.message || '创建失败', true);
-                }
-            } catch (error) {
-                showToast('创建身份失败', true);
-            }
+                if (response.ok) { showToast('身份创建成功'); document.getElementById('createForm').reset(); currentPage = 0; loadIdentities(); }
+                else { const error = await response.json(); showToast(error.message || '创建失败', true); }
+            } catch (error) { showToast('创建身份失败', true); }
         });
 
-        document.getElementById('typeFilter').addEventListener('change', () => {
-            currentPage = 0;
-            loadIdentities();
-        });
+        document.getElementById('typeFilter').addEventListener('change', () => { currentPage = 0; loadIdentities(); });
 
         async function regenerateKey(id) {
             try {
-                const response = await fetch(`${API_BASE}/${id}/regenerate-key`, {
-                    method: 'POST'
-                });
-
-                if (response.ok) {
-                    showToast('API Key 已重新生成');
-                    loadIdentities();
-                } else {
-                    const error = await response.json();
-                    showToast(error.message || '操作失败', true);
-                }
-            } catch (error) {
-                showToast('操作失败', true);
-            }
+                const response = await fetch(`${API_BASE}/${id}/regenerate-key`, { method: 'POST' });
+                if (response.ok) { showToast('API Key 已重新生成'); loadIdentities(); }
+                else { const error = await response.json(); showToast(error.message || '操作失败', true); }
+            } catch (error) { showToast('操作失败', true); }
         }
 
-        function openDeleteModal(id) {
-            currentIdentityId = id;
-            document.getElementById('deleteModal').classList.add('active');
-        }
-
-        function closeDeleteModal() {
-            document.getElementById('deleteModal').classList.remove('active');
-            currentIdentityId = null;
-        }
+        function openDeleteModal(id) { currentIdentityId = id; document.getElementById('deleteModal').classList.add('active'); }
+        function closeDeleteModal() { document.getElementById('deleteModal').classList.remove('active'); currentIdentityId = null; }
 
         async function confirmDelete() {
             if (!currentIdentityId) return;
-
             try {
-                const response = await fetch(`${API_BASE}/${currentIdentityId}`, {
-                    method: 'DELETE'
-                });
-
-                if (response.ok) {
-                    showToast('身份已删除');
-                    closeDeleteModal();
-                    loadIdentities();
-                } else {
-                    const error = await response.json();
-                    showToast(error.message || '删除失败', true);
-                }
-            } catch (error) {
-                showToast('删除失败', true);
-            }
+                const response = await fetch(`${API_BASE}/${currentIdentityId}`, { method: 'DELETE' });
+                if (response.ok) { showToast('身份已删除'); closeDeleteModal(); loadIdentities(); }
+                else { const error = await response.json(); showToast(error.message || '删除失败', true); }
+            } catch (error) { showToast('删除失败', true); }
         }
 
         loadIdentities();

@@ -11,9 +11,6 @@ public class Identity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 100)
-    private String name;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private IdentityType type;
@@ -43,14 +40,6 @@ public class Identity {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public IdentityType getType() {
