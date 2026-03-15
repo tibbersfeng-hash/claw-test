@@ -438,6 +438,166 @@ X-API-Key: sk-xxx
 
 ---
 
+## 项目管理 API
+
+项目管理接口无需认证。
+
+### 1. 创建项目
+
+**请求**
+
+```
+POST /api/projects
+Content-Type: application/json
+```
+
+**请求体**
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| name | string | 是 | 项目名称，最大 100 字符 |
+| repoUrl | string | 否 | 仓库地址，最大 500 字符 |
+| projectPath | string | 否 | 项目路径，最大 500 字符 |
+
+**请求示例**
+
+```json
+{
+  "name": "claw-test",
+  "repoUrl": "https://github.com/tibbersfeng-hash/claw-test.git",
+  "projectPath": "/opt/codegspace/claw-test"
+}
+```
+
+**响应示例**
+
+```json
+{
+  "id": 1,
+  "name": "claw-test",
+  "repoUrl": "https://github.com/tibbersfeng-hash/claw-test.git",
+  "projectPath": "/opt/codegspace/claw-test",
+  "createdAt": "2026-03-15T22:50:00.000",
+  "updatedAt": "2026-03-15T22:50:00.000"
+}
+```
+
+---
+
+### 2. 查询项目列表
+
+**请求**
+
+```
+GET /api/projects?page=0&size=10&name=claw
+```
+
+**查询参数**
+
+| 参数 | 类型 | 必填 | 默认值 | 说明 |
+|------|------|------|--------|------|
+| page | int | 否 | 0 | 页码，从 0 开始 |
+| size | int | 否 | 10 | 每页数量，最大 100 |
+| name | string | 否 | - | 按名称模糊搜索 |
+
+**响应示例**
+
+```json
+{
+  "content": [
+    {
+      "id": 1,
+      "name": "claw-test",
+      "repoUrl": "https://github.com/tibbersfeng-hash/claw-test.git",
+      "projectPath": "/opt/codegspace/claw-test",
+      "createdAt": "2026-03-15T22:50:00.000",
+      "updatedAt": "2026-03-15T22:50:00.000"
+    }
+  ],
+  "totalElements": 1,
+  "totalPages": 1,
+  "number": 0,
+  "size": 10
+}
+```
+
+---
+
+### 3. 查询单个项目
+
+**请求**
+
+```
+GET /api/projects/{id}
+```
+
+**路径参数**
+
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| id | long | 项目 ID |
+
+---
+
+### 4. 更新项目
+
+**请求**
+
+```
+PUT /api/projects/{id}
+Content-Type: application/json
+```
+
+**请求体**
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| name | string | 是 | 项目名称，最大 100 字符 |
+| repoUrl | string | 否 | 仓库地址，最大 500 字符 |
+| projectPath | string | 否 | 项目路径，最大 500 字符 |
+
+**请求示例**
+
+```json
+{
+  "name": "claw-test-v2",
+  "repoUrl": "https://github.com/tibbersfeng-hash/claw-test.git",
+  "projectPath": "/opt/codegspace/claw-test"
+}
+```
+
+---
+
+### 5. 删除项目
+
+**请求**
+
+```
+DELETE /api/projects/{id}
+```
+
+**响应**
+
+- 204 No Content - 删除成功
+- 404 Not Found - 项目不存在
+
+---
+
+## 数据模型
+
+### 项目 (Project)
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| id | long | 主键 |
+| name | string | 项目名称 |
+| repoUrl | string | 仓库地址 |
+| projectPath | string | 项目路径 |
+| createdAt | datetime | 创建时间 |
+| updatedAt | datetime | 修改时间 |
+
+---
+
 ## 错误响应
 
 所有错误响应格式：
@@ -489,4 +649,20 @@ curl -X PUT http://172.25.0.48:8080/api/tasks/1/complete \
 # 5. 删除任务
 curl -X DELETE http://172.25.0.48:8080/api/tasks/1 \
   -H "X-API-Key: sk-xxx"
+
+# 6. 创建项目
+curl -X POST http://172.25.0.48:8080/api/projects \
+  -H "Content-Type: application/json" \
+  -d '{"name": "my-project", "repoUrl": "https://github.com/user/repo.git", "projectPath": "/opt/codegspace/my-project"}'
+
+# 7. 查询项目列表
+curl http://172.25.0.48:8080/api/projects
+
+# 8. 更新项目
+curl -X PUT http://172.25.0.48:8080/api/projects/1 \
+  -H "Content-Type: application/json" \
+  -d '{"name": "my-project-v2", "repoUrl": "https://github.com/user/repo.git", "projectPath": "/opt/codegspace/my-project"}'
+
+# 9. 删除项目
+curl -X DELETE http://172.25.0.48:8080/api/projects/1
 ```
