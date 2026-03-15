@@ -139,3 +139,19 @@ curl -X PUT http://172.25.0.48:8080/api/tasks/45/complete \
 2. **Record task ID immediately** - You'll need it to complete the task
 3. **Write meaningful summaries** - Future reference depends on good documentation
 4. **Mark as completed when done** - Don't leave tasks in IN_PROGRESS state
+5. **Clean up test data** - If you create test data during development/testing, DELETE it afterwards
+
+## Test Data Cleanup
+
+When testing features that create records, you MUST clean up afterward:
+
+```bash
+# Delete test task
+curl -X DELETE http://172.25.0.48:8080/api/tasks/{TEST_ID} \
+  -H "X-API-Key: $TASK_API_KEY"
+
+# Delete test project
+curl -X DELETE http://172.25.0.48:8080/api/projects/{TEST_ID}
+```
+
+**Test data should NEVER remain in the system after development is complete.**
