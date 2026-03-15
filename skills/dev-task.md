@@ -16,8 +16,13 @@ This skill ensures all development tasks are tracked in the task management syst
 ## API Configuration
 
 - **Base URL**: `http://172.25.0.48:8080`
-- **API Key**: `sk-64900255a7114df1a65c16c7a2a36f68`
-- **Auth Header**: `X-API-Key: sk-64900255a7114df1a65c16c7a2a36f68`
+- **API Key**: 从环境变量 `TASK_API_KEY` 获取
+- **Auth Header**: `X-API-Key: $TASK_API_KEY`
+
+**Setup:** Set environment variable before use:
+```bash
+export TASK_API_KEY="your-api-key-here"
+```
 
 ## Workflow
 
@@ -50,7 +55,7 @@ digraph dev_task {
 ```bash
 curl -X POST http://172.25.0.48:8080/api/tasks \
   -H "Content-Type: application/json" \
-  -H "X-API-Key: sk-64900255a7114df1a65c16c7a2a36f68" \
+  -H "X-API-Key: $TASK_API_KEY" \
   -d '{"content": "<original requirement text>"}'
 ```
 
@@ -82,7 +87,7 @@ After finishing, update the task with completion summary:
 ```bash
 curl -X PUT http://172.25.0.48:8080/api/tasks/{TASK_ID}/complete \
   -H "Content-Type: application/json" \
-  -H "X-API-Key: sk-64900255a7114df1a65c16c7a2a36f68" \
+  -H "X-API-Key: $TASK_API_KEY" \
   -d '{"remark": "<completion summary>"}'
 ```
 
@@ -110,7 +115,7 @@ curl -X PUT http://172.25.0.48:8080/api/tasks/{TASK_ID}/complete \
 ```bash
 curl -X POST http://172.25.0.48:8080/api/tasks \
   -H "Content-Type: application/json" \
-  -H "X-API-Key: sk-64900255a7114df1a65c16c7a2a36f68" \
+  -H "X-API-Key: $TASK_API_KEY" \
   -d '{"content": "Add a login button to the homepage"}'
 # Response: {"id": 45, ...}
 ```
@@ -124,7 +129,7 @@ curl -X POST http://172.25.0.48:8080/api/tasks \
 ```bash
 curl -X PUT http://172.25.0.48:8080/api/tasks/45/complete \
   -H "Content-Type: application/json" \
-  -H "X-API-Key: sk-64900255a7114df1a65c16c7a2a36f68" \
+  -H "X-API-Key: $TASK_API_KEY" \
   -d '{"remark": "Added login button to homepage.\n- Modified: index.html (added button element)\n- Modified: app.js (added click handler)\n- Tested: button shows login modal on click"}'
 ```
 
