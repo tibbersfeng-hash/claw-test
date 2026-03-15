@@ -211,7 +211,7 @@ X-API-Key: sk-xxx
 **请求**
 
 ```
-GET /api/tasks?page=0&size=10&status=INIT&identityType=PM
+GET /api/tasks?page=0&size=10&status=INIT&creatorType=PM&handlerType=DEV
 X-API-Key: sk-xxx
 ```
 
@@ -222,7 +222,8 @@ X-API-Key: sk-xxx
 | page | int | 否 | 0 | 页码，从 0 开始 |
 | size | int | 否 | 10 | 每页数量，最大 100 |
 | status | string | 否 | - | 状态筛选：INIT / IN_PROGRESS / COMPLETED |
-| identityType | string | 否 | - | 身份类型筛选：PM / OPS / DEV |
+| creatorType | string | 否 | - | 创建者身份类型筛选：PM / OPS / DEV |
+| handlerType | string | 否 | - | 处理人身份类型筛选：PM / OPS / DEV |
 
 **响应示例**
 

@@ -40,12 +40,13 @@ public class TaskController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) TaskStatus status,
-            @RequestParam(required = false) IdentityType identityType) {
+            @RequestParam(required = false) IdentityType creatorType,
+            @RequestParam(required = false) IdentityType handlerType) {
 
         size = Math.min(size, 100);
         page = Math.max(page, 0);
 
-        Page<TaskResponse> response = taskService.getTasks(page, size, status, identityType);
+        Page<TaskResponse> response = taskService.getTasks(page, size, status, creatorType, handlerType);
         return ResponseEntity.ok(response);
     }
 

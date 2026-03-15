@@ -107,8 +107,15 @@
                     <option value="IN_PROGRESS">进行中</option>
                     <option value="COMPLETED">已完成</option>
                 </select>
-                <label style="margin-left: 15px;">身份类型筛选：</label>
-                <select id="identityTypeFilter">
+                <label style="margin-left: 15px;">创建者筛选：</label>
+                <select id="creatorTypeFilter">
+                    <option value="">全部</option>
+                    <option value="PM">产品经理</option>
+                    <option value="OPS">运维</option>
+                    <option value="DEV">开发</option>
+                </select>
+                <label style="margin-left: 15px;">处理人筛选：</label>
+                <select id="handlerTypeFilter">
                     <option value="">全部</option>
                     <option value="PM">产品经理</option>
                     <option value="OPS">运维</option>
@@ -188,11 +195,13 @@
 
         async function loadTasks() {
             const typeFilter = document.getElementById('statusFilter').value;
-            const identityTypeFilter = document.getElementById('identityTypeFilter').value;
+            const creatorTypeFilter = document.getElementById('creatorTypeFilter').value;
+            const handlerTypeFilter = document.getElementById('handlerTypeFilter').value;
             currentStatus = typeFilter;
             let url = `${API_BASE}?page=${currentPage}&size=10`;
             if (typeFilter) url += `&status=${typeFilter}`;
-            if (identityTypeFilter) url += `&identityType=${identityTypeFilter}`;
+            if (creatorTypeFilter) url += `&creatorType=${creatorTypeFilter}`;
+            if (handlerTypeFilter) url += `&handlerType=${handlerTypeFilter}`;
             try {
                 const response = await fetch(url, { headers: getHeaders() });
                 if (response.status === 401) { showToast('请先输入有效的 API Key', true); return; }
@@ -268,7 +277,9 @@
 
         document.getElementById('statusFilter').addEventListener('change', () => { currentPage = 0; loadTasks(); });
 
-        document.getElementById('identityTypeFilter').addEventListener('change', () => { currentPage = 0; loadTasks(); });
+        document.getElementById('creatorTypeFilter').addEventListener('change', () => { currentPage = 0; loadTasks(); });
+
+        document.getElementById('handlerTypeFilter').addEventListener('change', () => { currentPage = 0; loadTasks(); });
 
         function openEditModal(taskId, content) {
             currentTaskId = taskId;

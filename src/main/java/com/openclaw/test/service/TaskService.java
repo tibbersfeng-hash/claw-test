@@ -49,19 +49,28 @@ public class TaskService {
         return identity.getType().name() + "-" + identity.getId();
     }
 
-    public Page<TaskResponse> getTasks(int page, int size, TaskStatus status, IdentityType identityType) {
+    public Page<TaskResponse> getTasks(int page, int size, TaskStatus status, IdentityType creatorType, IdentityType handlerType) {
         Pageable pageable = PageRequest.of(page, size);
 
         Page<Task> taskPage;
         boolean hasStatus = status != null;
-        boolean hasIdentityType = identityType != null;
+        boolean hasCreatorType = creatorType != null;
+        boolean hasHandlerType = handlerType != null;
 
-        if (hasStatus && hasIdentityType) {
-            taskPage = taskRepository.findByStatusAndCreatorStartingWith(status, identityType.name(), pageable);
+        if (hasStatus && hasCreatorType && hasHandlerType) {
+            taskPage = taskRepository.findByStatusAndCreatorStartingWithAndHandlerStartingWith(status, creatorType.name(), handlerType.name(), pageable);
+        } else if (hasStatus && hasCreatorType) {
+            taskPage = taskRepository.findByStatusAndCreatorStartingWith(status, creatorType.name(), pageable);
+        } else if (hasStatus && hasHandlerType) {
+            taskPage = taskRepository.findByStatusAndHandlerStartingWith(status, handlerType.name(), pageable);
+        } else if (hasCreatorType && hasHandlerType) {
+            taskPage = taskRepository.findByCreatorStartingWithAndHandlerStartingWith(creatorType.name(), handlerType.name(), pageable);
         } else if (hasStatus) {
             taskPage = taskRepository.findByStatus(status, pageable);
-        } else if (hasIdentityType) {
-            taskPage = taskRepository.findByCreatorStartingWith(identityType.name(), pageable);
+        } else if (hasCreatorType) {
+            taskPage = taskRepository.findByCreatorStartingWith(creatorType.name(), pageable);
+        } else if (hasHandlerType) {
+            taskPage = taskRepository.findByHandlerStartingWith(handlerType.name(), pageable);
         } else {
             taskPage = taskRepository.findAll(pageable);
         }

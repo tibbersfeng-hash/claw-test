@@ -15,4 +15,12 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     Page<Task> findByCreatorStartingWith(String identityType, Pageable pageable);
 
     Page<Task> findByStatusAndCreatorStartingWith(TaskStatus status, String identityType, Pageable pageable);
+
+    Page<Task> findByHandlerStartingWith(String identityType, Pageable pageable);
+
+    Page<Task> findByStatusAndHandlerStartingWith(TaskStatus status, String identityType, Pageable pageable);
+
+    Page<Task> findByCreatorStartingWithAndHandlerStartingWith(String creatorType, String handlerType, Pageable pageable);
+
+    Page<Task> findByStatusAndCreatorStartingWithAndHandlerStartingWith(TaskStatus status, String creatorType, String handlerType, Pageable pageable);
 }
