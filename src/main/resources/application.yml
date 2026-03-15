@@ -5,6 +5,16 @@ spring:
   application:
     name: claw-test
 
+  datasource:
+    url: jdbc:sqlite:/tmp/claw-test/tasks.db
+    driver-class-name: org.sqlite.JDBC
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
+
 logging:
   level:
     root: INFO
