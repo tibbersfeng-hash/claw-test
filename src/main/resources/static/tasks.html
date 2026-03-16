@@ -28,6 +28,8 @@
         .btn-warning:hover { background: #d46b08; }
         .btn-danger { background: #ff4d4f; color: white; }
         .btn-danger:hover { background: #d9363e; }
+        .btn-info { background: #722ed1; color: white; }
+        .btn-info:hover { background: #531dab; }
         .btn-sm { padding: 6px 12px; font-size: 12px; }
         .filter-bar { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
         .filter-bar select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
@@ -38,7 +40,7 @@
         .task-content { font-size: 16px; color: #333; flex: 1; margin-right: 10px; white-space: pre-wrap; word-break: break-word; }
         .task-meta { display: flex; gap: 15px; font-size: 12px; color: #999; margin-bottom: 10px; }
         .task-remark { font-size: 14px; color: #666; background: #f9f9f9; padding: 8px 10px; border-radius: 4px; margin-top: 10px; }
-        .task-actions { margin-top: 10px; display: flex; gap: 8px; }
+        .task-actions { margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; }
         .status { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; }
         .status-INIT { background: #e6f7ff; color: #1890ff; }
         .status-IN_PROGRESS { background: #fff7e6; color: #fa8c16; }
@@ -57,7 +59,10 @@
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
         .modal.active { display: flex; }
         .modal-content { background: white; padding: 20px; border-radius: 8px; width: 90%; max-width: 500px; }
-        .modal-header { font-size: 18px; font-weight: 600; margin-bottom: 15px; }
+        .modal-content.large { max-width: 800px; max-height: 80vh; overflow-y: auto; }
+        .modal-header { font-size: 18px; font-weight: 600; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .modal-close { font-size: 24px; cursor: pointer; color: #999; }
+        .modal-close:hover { color: #333; }
         .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
         .btn-cancel { background: #f5f5f5; color: #666; }
         .btn-cancel:hover { background: #e8e8e8; }
@@ -68,6 +73,14 @@
         .api-key-section label { font-weight: 600; color: #1890ff; }
         .api-key-section input { margin-top: 8px; }
         .api-key-hint { font-size: 12px; color: #666; margin-top: 5px; }
+        .hint-text { font-size: 12px; color: #999; margin-top: 4px; }
+        .markdown-content { background: #fafafa; padding: 15px; border-radius: 6px; border: 1px solid #eee; white-space: pre-wrap; word-break: break-word; font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace; font-size: 13px; line-height: 1.6; max-height: 400px; overflow-y: auto; }
+        .design-doc-item { padding: 12px; border: 1px solid #eee; border-radius: 6px; margin-bottom: 10px; }
+        .design-doc-item:hover { border-color: #ddd; background: #fafafa; }
+        .design-doc-title { font-weight: 600; color: #333; margin-bottom: 8px; }
+        .design-doc-meta { font-size: 12px; color: #999; margin-bottom: 8px; }
+        .design-doc-preview { font-size: 13px; color: #666; background: #f5f5f5; padding: 10px; border-radius: 4px; max-height: 100px; overflow: hidden; text-overflow: ellipsis; }
+        .design-doc-actions { margin-top: 8px; display: flex; gap: 8px; }
     </style>
 </head>
 <body>
@@ -160,6 +173,11 @@
                 <label for="remark">完成备注</label>
                 <textarea id="remark" placeholder="请输入完成备注（可选）" maxlength="500"></textarea>
             </div>
+            <div class="form-group">
+                <label for="designContent">设计内容（Markdown格式）</label>
+                <textarea id="designContent" placeholder="请输入设计内容，支持 Markdown 格式&#10;&#10;示例：&#10;# 模块设计&#10;&#10;## 概述&#10;功能说明...&#10;&#10;## 实现方案&#10;1. 步骤一&#10;2. 步骤二" maxlength="10000" style="min-height: 200px;"></textarea>
+                <div class="hint-text">DEV完成任务时填写设计内容，将自动创建设计文档</div>
+            </div>
             <div class="modal-actions">
                 <button class="btn btn-cancel" onclick="closeCompleteModal()">取消</button>
                 <button class="btn btn-success" onclick="confirmComplete()">确认完成</button>
@@ -179,10 +197,45 @@
         </div>
     </div>
 
+    <!-- 设计文档列表模态框 -->
+    <div class="modal" id="designDocsModal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <span>📄 设计文档</span>
+                <span class="modal-close" onclick="closeDesignDocsModal()">&times;</span>
+            </div>
+            <div id="designDocsList"></div>
+        </div>
+    </div>
+
+    <!-- 设计文档详情模态框 -->
+    <div class="modal" id="designDocDetailModal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <span id="docDetailTitle">设计文档详情</span>
+                <span class="modal-close" onclick="closeDesignDocDetailModal()">&times;</span>
+            </div>
+            <div class="form-group">
+                <label>创建者：<span id="docDetailCreator"></span></label>
+            </div>
+            <div class="form-group">
+                <label>创建时间：<span id="docDetailCreatedAt"></span></label>
+            </div>
+            <div class="form-group">
+                <label>内容</label>
+                <div class="markdown-content" id="docDetailContent"></div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="closeDesignDocDetailModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
     <div class="toast" id="toast"></div>
 
     <script>
         const API_BASE = '/api/tasks';
+        const DESIGN_DOC_API = '/api/design-docs';
         let currentPage = 0;
         let currentStatus = '';
         let currentTaskId = null;
@@ -241,6 +294,7 @@
                         <button class="btn btn-warning btn-sm" onclick="openEditModal(${task.id}, ${escapeJsString(task.content)})">修改内容</button>
                         ${task.status === 'INIT' ? `<button class="btn btn-primary btn-sm" onclick="startTask(${task.id})">开始任务</button>` : ''}
                         ${task.status !== 'COMPLETED' ? `<button class="btn btn-success btn-sm" onclick="openCompleteModal(${task.id})">完成任务</button>` : ''}
+                        <button class="btn btn-info btn-sm" onclick="openDesignDocsModal(${task.id})">设计文档</button>
                         <button class="btn btn-danger btn-sm" onclick="openDeleteModal(${task.id})">删除</button>
                     </div>
                 </li>
@@ -320,6 +374,7 @@
         function openCompleteModal(taskId) {
             currentTaskId = taskId;
             document.getElementById('remark').value = '';
+            document.getElementById('designContent').value = '';
             document.getElementById('completeModal').classList.add('active');
         }
         function closeCompleteModal() { document.getElementById('completeModal').classList.remove('active'); currentTaskId = null; }
@@ -327,13 +382,20 @@
         async function confirmComplete() {
             if (!currentTaskId) return;
             const remark = document.getElementById('remark').value.trim();
+            const designContent = document.getElementById('designContent').value.trim();
             try {
+                const body = { remark };
+                if (designContent) body.designContent = designContent;
                 const response = await fetch(`${API_BASE}/${currentTaskId}/complete`, {
                     method: 'PUT',
                     headers: getHeaders(),
-                    body: JSON.stringify({ remark })
+                    body: JSON.stringify(body)
                 });
-                if (response.ok) { showToast('任务已完成'); closeCompleteModal(); loadTasks(); }
+                if (response.ok) {
+                    showToast('任务已完成' + (designContent ? '，设计文档已创建' : ''));
+                    closeCompleteModal();
+                    loadTasks();
+                }
                 else { const error = await response.json(); showToast(error.message || '操作失败', true); }
             } catch (error) { showToast('操作失败', true); }
         }
@@ -365,6 +427,60 @@
                 if (response.ok) { showToast('任务已删除'); closeDeleteModal(); loadTasks(); }
                 else { const error = await response.json(); showToast(error.message || '删除失败', true); }
             } catch (error) { showToast('删除失败', true); }
+        }
+
+        // 设计文档相关功能
+        async function openDesignDocsModal(taskId) {
+            currentTaskId = taskId;
+            document.getElementById('designDocsModal').classList.add('active');
+            await loadDesignDocs(taskId);
+        }
+        function closeDesignDocsModal() {
+            document.getElementById('designDocsModal').classList.remove('active');
+            currentTaskId = null;
+        }
+
+        async function loadDesignDocs(taskId) {
+            const listEl = document.getElementById('designDocsList');
+            listEl.innerHTML = '<div class="empty-state">加载中...</div>';
+            try {
+                const response = await fetch(`${DESIGN_DOC_API}?taskId=${taskId}`, { headers: getHeaders() });
+                if (response.status === 401) {
+                    listEl.innerHTML = '<div class="empty-state">请先输入有效的 API Key</div>';
+                    return;
+                }
+                const data = await response.json();
+                if (data.content.length === 0) {
+                    listEl.innerHTML = '<div class="empty-state">暂无设计文档</div>';
+                    return;
+                }
+                listEl.innerHTML = data.content.map(doc => `
+                    <div class="design-doc-item">
+                        <div class="design-doc-title">${escapeHtml(doc.title)}</div>
+                        <div class="design-doc-meta">
+                            <span>👤 ${escapeHtml(doc.creator)}</span>
+                            <span>📅 ${formatDate(doc.createdAt)}</span>
+                        </div>
+                        <div class="design-doc-preview">${escapeHtml(doc.content.substring(0, 200))}${doc.content.length > 200 ? '...' : ''}</div>
+                        <div class="design-doc-actions">
+                            <button class="btn btn-primary btn-sm" onclick="viewDesignDoc(${doc.id}, ${escapeJsString(doc.title)}, ${escapeJsString(doc.creator)}, '${doc.createdAt}', ${escapeJsString(doc.content)})">查看详情</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                listEl.innerHTML = '<div class="empty-state">加载失败</div>';
+            }
+        }
+
+        function viewDesignDoc(id, title, creator, createdAt, content) {
+            document.getElementById('docDetailTitle').textContent = title;
+            document.getElementById('docDetailCreator').textContent = creator;
+            document.getElementById('docDetailCreatedAt').textContent = formatDate(createdAt);
+            document.getElementById('docDetailContent').textContent = content;
+            document.getElementById('designDocDetailModal').classList.add('active');
+        }
+        function closeDesignDocDetailModal() {
+            document.getElementById('designDocDetailModal').classList.remove('active');
         }
 
         async function loadProjects() {
