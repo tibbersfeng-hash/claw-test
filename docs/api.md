@@ -27,7 +27,7 @@ Content-Type: application/json
 
 | 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
-| type | string | 是 | 身份类型：PM / OPS / DEV |
+| type | string | 是 | 身份类型：PM / OPS / DEV / QA |
 
 **请求示例**
 
@@ -222,8 +222,8 @@ X-API-Key: sk-xxx
 | page | int | 否 | 0 | 页码，从 0 开始 |
 | size | int | 否 | 10 | 每页数量，最大 100 |
 | status | string | 否 | - | 状态筛选：INIT / IN_PROGRESS / COMPLETED |
-| creatorType | string | 否 | - | 创建者身份类型筛选：PM / OPS / DEV |
-| handlerType | string | 否 | - | 处理人身份类型筛选：PM / OPS / DEV |
+| creatorType | string | 否 | - | 创建者身份类型筛选：PM / OPS / DEV / QA |
+| handlerType | string | 否 | - | 处理人身份类型筛选：PM / OPS / DEV / QA |
 
 **响应示例**
 
@@ -435,6 +435,7 @@ X-API-Key: sk-xxx
 | 产品经理 | PM | Product Manager |
 | 运维 | OPS | Operations |
 | 开发 | DEV | Developer |
+| 测试 | QA | Quality Assurance |
 
 ---
 

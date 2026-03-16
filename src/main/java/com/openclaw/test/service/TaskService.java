@@ -46,6 +46,12 @@ public class TaskService {
                     .ifPresent(dev -> task.setHandler(getCreatorName(dev)));
         }
 
+        // DEV创建的任务，自动分配QA作为处理人
+        if (identity.getType() == IdentityType.DEV) {
+            identityRepository.findFirstByTypeOrderByIdAsc(IdentityType.QA)
+                    .ifPresent(qa -> task.setHandler(getCreatorName(qa)));
+        }
+
         Task savedTask = taskRepository.save(task);
         return fillProjectName(TaskResponse.fromEntity(savedTask));
     }
