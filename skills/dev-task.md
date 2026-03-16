@@ -108,7 +108,6 @@ curl -X PUT http://172.25.0.48:8080/api/tasks/{TASK_ID}/complete \
 |--------|--------|----------|
 | Create task | POST | `/api/tasks` |
 | Get task | GET | `/api/tasks/{id}` |
-| Start task | PUT | `/api/tasks/{id}/start` |
 | Complete task | PUT | `/api/tasks/{id}/complete` |
 | List tasks | GET | `/api/tasks` |
 
@@ -156,9 +155,8 @@ curl -X PUT http://172.25.0.48:8080/api/tasks/45/complete \
 
 1. 查询状态为 `INIT` 的任务
 2. 按创建时间升序，取最早的一条
-3. 开始任务（状态变为 `IN_PROGRESS`）
-4. 执行任务
-5. 完成后标记为 `COMPLETED`
+3. 执行任务
+4. 完成后标记为 `COMPLETED`
 
 ### API 调用
 
@@ -167,11 +165,7 @@ curl -X PUT http://172.25.0.48:8080/api/tasks/45/complete \
 curl -s "http://172.25.0.48:8080/api/tasks?status=INIT&size=1" \
   -H "X-API-Key: $TASK_API_KEY"
 
-# 2. 开始任务
-curl -X PUT http://172.25.0.48:8080/api/tasks/{TASK_ID}/start \
-  -H "X-API-Key: $TASK_API_KEY"
-
-# 3. 完成任务
+# 2. 完成任务
 curl -X PUT http://172.25.0.48:8080/api/tasks/{TASK_ID}/complete \
   -H "Content-Type: application/json" \
   -H "X-API-Key: $TASK_API_KEY" \
@@ -197,16 +191,14 @@ digraph heartbeat {
     "Heartbeat triggered" [shape=doublecircle];
     "Query INIT tasks" [shape=box];
     "Has task?" [shape=diamond];
-    "Start task" [shape=box];
     "Execute task" [shape=box];
     "Complete task" [shape=box];
     "Wait next heartbeat" [shape=doublecircle];
 
     "Heartbeat triggered" -> "Query INIT tasks";
     "Query INIT tasks" -> "Has task?";
-    "Has task?" -> "Start task" [label="yes"];
+    "Has task?" -> "Execute task" [label="yes"];
     "Has task?" -> "Wait next heartbeat" [label="no"];
-    "Start task" -> "Execute task";
     "Execute task" -> "Complete task";
     "Complete task" -> "Wait next heartbeat";
 }
