@@ -145,3 +145,69 @@ curl -X PUT http://172.25.0.48:8080/api/tasks/45/complete \
 3. **Write meaningful summaries** - Future reference depends on good documentation
 4. **Mark as completed when done** - Don't leave tasks in IN_PROGRESS state
 5. **Only for user requests** - Never create tasks for your own testing or validation
+
+---
+
+## Heartbeat - 定时任务拉取
+
+定时检查未完成的任务，每次拉取一个执行。
+
+### 拉取逻辑
+
+1. 查询状态为 `INIT` 的任务
+2. 按创建时间升序，取最早的一条
+3. 开始任务（状态变为 `IN_PROGRESS`）
+4. 执行任务
+5. 完成后标记为 `COMPLETED`
+
+### API 调用
+
+```bash
+# 1. 查询最早未开始的任务
+curl -s "http://172.25.0.48:8080/api/tasks?status=INIT&size=1" \
+  -H "X-API-Key: $TASK_API_KEY"
+
+# 2. 开始任务
+curl -X PUT http://172.25.0.48:8080/api/tasks/{TASK_ID}/start \
+  -H "X-API-Key: $TASK_API_KEY"
+
+# 3. 完成任务
+curl -X PUT http://172.25.0.48:8080/api/tasks/{TASK_ID}/complete \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: $TASK_API_KEY" \
+  -d '{"remark": "<completion summary>"}'
+```
+
+### 设置定时任务
+
+使用 cc-connect 的 cron 功能：
+
+```bash
+cc-connect cron add --cron "*/5 * * * *" \
+  --prompt "检查未完成任务：调用 GET /api/tasks?status=INIT&size=1 获取任务，如有任务则开始执行，完成后调用 /complete 接口" \
+  --desc "Task Heartbeat"
+```
+
+**建议间隔**: 每 5 分钟检查一次
+
+### Workflow (Heartbeat)
+
+```dot
+digraph heartbeat {
+    "Heartbeat triggered" [shape=doublecircle];
+    "Query INIT tasks" [shape=box];
+    "Has task?" [shape=diamond];
+    "Start task" [shape=box];
+    "Execute task" [shape=box];
+    "Complete task" [shape=box];
+    "Wait next heartbeat" [shape=doublecircle];
+
+    "Heartbeat triggered" -> "Query INIT tasks";
+    "Query INIT tasks" -> "Has task?";
+    "Has task?" -> "Start task" [label="yes"];
+    "Has task?" -> "Wait next heartbeat" [label="no"];
+    "Start task" -> "Execute task";
+    "Execute task" -> "Complete task";
+    "Complete task" -> "Wait next heartbeat";
+}
+```
