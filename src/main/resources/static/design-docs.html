@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>设计文档管理</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; min-height: 100vh; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        h1 { color: #333; margin-bottom: 20px; text-align: center; }
+        .nav { margin-bottom: 20px; text-align: center; }
+        .nav a { color: #4a90d9; text-decoration: none; margin: 0 10px; }
+        .nav a:hover { text-decoration: underline; }
+        .card { background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 20px; margin-bottom: 20px; }
+        .card-title { font-size: 18px; font-weight: 600; color: #333; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; color: #666; font-size: 14px; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; transition: border-color 0.2s; }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: #4a90d9; }
+        .form-group textarea { resize: vertical; min-height: 150px; font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace; }
+        .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+        .btn-primary { background: #4a90d9; color: white; }
+        .btn-primary:hover { background: #357abd; }
+        .btn-success { background: #52c41a; color: white; }
+        .btn-success:hover { background: #389e0d; }
+        .btn-warning { background: #fa8c16; color: white; }
+        .btn-warning:hover { background: #d46b08; }
+        .btn-danger { background: #ff4d4f; color: white; }
+        .btn-danger:hover { background: #d9363e; }
+        .btn-info { background: #722ed1; color: white; }
+        .btn-info:hover { background: #531dab; }
+        .btn-sm { padding: 6px 12px; font-size: 12px; }
+        .filter-bar { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; margin-bottom: 15px; }
+        .filter-bar input, .filter-bar select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+        .doc-list { list-style: none; }
+        .doc-item { padding: 15px; border: 1px solid #eee; border-radius: 6px; margin-bottom: 10px; }
+        .doc-item:hover { border-color: #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .doc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+        .doc-title { font-size: 16px; font-weight: 600; color: #333; flex: 1; margin-right: 10px; }
+        .doc-meta { display: flex; gap: 15px; font-size: 12px; color: #999; margin-bottom: 10px; }
+        .doc-content-preview { font-size: 13px; color: #666; background: #f9f9f9; padding: 10px; border-radius: 4px; max-height: 80px; overflow: hidden; text-overflow: ellipsis; white-space: pre-wrap; font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace; }
+        .doc-actions { margin-top: 10px; display: flex; gap: 8px; }
+        .task-link { color: #4a90d9; text-decoration: none; }
+        .task-link:hover { text-decoration: underline; }
+        .pagination { display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
+        .pagination button { padding: 8px 15px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; }
+        .pagination button:hover:not(:disabled) { background: #f5f5f5; }
+        .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .pagination .page-info { padding: 8px 15px; color: #666; }
+        .empty-state { text-align: center; padding: 40px; color: #999; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; padding: 20px; border-radius: 8px; width: 90%; max-width: 500px; }
+        .modal-content.large { max-width: 800px; max-height: 80vh; overflow-y: auto; }
+        .modal-header { font-size: 18px; font-weight: 600; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .modal-close { font-size: 24px; cursor: pointer; color: #999; }
+        .modal-close:hover { color: #333; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+        .btn-cancel { background: #f5f5f5; color: #666; }
+        .btn-cancel:hover { background: #e8e8e8; }
+        .toast { position: fixed; top: 20px; right: 20px; padding: 12px 20px; background: #52c41a; color: white; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transform: translateX(120%); transition: transform 0.3s; z-index: 1001; }
+        .toast.show { transform: translateX(0); }
+        .toast.error { background: #ff4d4f; }
+        .api-key-section { background: #e6f7ff; padding: 15px; border-radius: 6px; margin-bottom: 20px; }
+        .api-key-section label { font-weight: 600; color: #1890ff; }
+        .api-key-section input { margin-top: 8px; }
+        .api-key-hint { font-size: 12px; color: #666; margin-top: 5px; }
+        .markdown-content { background: #fafafa; padding: 15px; border-radius: 6px; border: 1px solid #eee; white-space: pre-wrap; word-break: break-word; font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace; font-size: 13px; line-height: 1.6; max-height: 500px; overflow-y: auto; }
+        .identity-type { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; margin-left: 6px; }
+        .identity-PM { background: #f0f5ff; color: #2f54eb; }
+        .identity-OPS { background: #fff1f0; color: #f5222d; }
+        .identity-DEV { background: #f6ffed; color: #52c41a; }
+        .identity-QA { background: #fff0f6; color: #eb2f96; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📄 设计文档管理</h1>
+        <div class="nav">
+            <a href="/tasks.html">任务管理</a>
+            <a href="/identities.html">身份管理</a>
+            <a href="/projects.html">项目管理</a>
+            <a href="/design-docs.html">设计文档</a>
+        </div>
+
+        <!-- API Key 认证 -->
+        <div class="api-key-section">
+            <label for="apiKey">🔑 API Key 认证</label>
+            <input type="text" id="apiKey" placeholder="请输入 API Key (从身份管理页面获取)" value="sk-9800eb048ad0446b8030e262efad9498">
+            <div class="api-key-hint">提示：请先在身份管理页面创建身份并获取 API Key</div>
+        </div>
+
+        <!-- 创建设计文档 -->
+        <div class="card">
+            <div class="card-title">创建设计文档</div>
+            <form id="createForm">
+                <div class="form-group">
+                    <label for="title">标题</label>
+                    <input type="text" id="title" placeholder="请输入设计文档标题" required maxlength="200">
+                </div>
+                <div class="form-group">
+                    <label for="taskId">关联任务（可选）</label>
+                    <select id="taskId">
+                        <option value="">无</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="content">内容（Markdown格式）</label>
+                    <textarea id="content" placeholder="请输入设计内容，支持 Markdown 格式&#10;&#10;示例：&#10;# 模块设计&#10;&#10;## 概述&#10;功能说明...&#10;&#10;## 实现方案&#10;1. 步骤一&#10;2. 步骤二" required maxlength="10000" style="min-height: 200px;"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">创建设计文档</button>
+            </form>
+        </div>
+
+        <!-- 设计文档列表 -->
+        <div class="card">
+            <div class="card-title">设计文档列表</div>
+            <div class="filter-bar">
+                <label>任务ID筛选：</label>
+                <input type="number" id="taskIdFilter" placeholder="输入任务ID" style="width: 150px;">
+                <button class="btn btn-primary btn-sm" onclick="filterByTaskId()">筛选</button>
+                <button class="btn btn-cancel btn-sm" onclick="clearFilter()">清除</button>
+            </div>
+            <ul class="doc-list" id="docList"></ul>
+            <div class="pagination" id="pagination"></div>
+        </div>
+    </div>
+
+    <!-- 查看设计文档模态框 -->
+    <div class="modal" id="viewModal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <span id="viewTitle">设计文档详情</span>
+                <span class="modal-close" onclick="closeViewModal()">&times;</span>
+            </div>
+            <div class="doc-meta" id="viewMeta"></div>
+            <div class="form-group">
+                <label>内容</label>
+                <div class="markdown-content" id="viewContent"></div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="closeViewModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 编辑设计文档模态框 -->
+    <div class="modal" id="editModal">
+        <div class="modal-content large">
+            <div class="modal-header">编辑设计文档</div>
+            <div class="form-group">
+                <label for="editTitle">标题</label>
+                <input type="text" id="editTitle" maxlength="200">
+            </div>
+            <div class="form-group">
+                <label for="editContent">内容（Markdown格式）</label>
+                <textarea id="editContent" maxlength="10000" style="min-height: 200px;"></textarea>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="closeEditModal()">取消</button>
+                <button class="btn btn-primary" onclick="confirmEdit()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 删除设计文档模态框 -->
+    <div class="modal" id="deleteModal">
+        <div class="modal-content">
+            <div class="modal-header">确认删除</div>
+            <p>确定要删除该设计文档吗？此操作不可恢复。</p>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="closeDeleteModal()">取消</button>
+                <button class="btn btn-danger" onclick="confirmDelete()">确认删除</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const API_BASE = '/api/design-docs';
+        let currentPage = 0;
+        let currentTaskId = null;
+        let currentDocId = null;
+
+        function getApiKey() { return document.getElementById('apiKey').value.trim(); }
+
+        function getHeaders() {
+            const apiKey = getApiKey();
+            const headers = { 'Content-Type': 'application/json' };
+            if (apiKey) headers['X-API-Key'] = apiKey;
+            return headers;
+        }
+
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show' + (isError ? ' error' : '');
+            setTimeout(() => { toast.className = 'toast'; }, 3000);
+        }
+
+        async function loadDocs() {
+            let url = `${API_BASE}?page=${currentPage}&size=10`;
+            if (currentTaskId) url += `&taskId=${currentTaskId}`;
+            try {
+                const response = await fetch(url, { headers: getHeaders() });
+                if (response.status === 401) { showToast('请先输入有效的 API Key', true); return; }
+                const data = await response.json();
+                renderDocs(data.content);
+                renderPagination(data.totalElements, data.totalPages, data.number);
+            } catch (error) { showToast('加载设计文档列表失败', true); }
+        }
+
+        function renderDocs(docs) {
+            const docList = document.getElementById('docList');
+            if (docs.length === 0) { docList.innerHTML = '<div class="empty-state">暂无设计文档</div>'; return; }
+            docList.innerHTML = docs.map(doc => `
+                <li class="doc-item">
+                    <div class="doc-header">
+                        <div class="doc-title">${escapeHtml(doc.title)}</div>
+                    </div>
+                    <div class="doc-meta">
+                        <span>👤 ${escapeHtml(doc.creator)}${getIdentityTypeBadge(doc.creator)}</span>
+                        ${doc.taskId ? `<span>📋 任务 <a href="/tasks.html" class="task-link">#${doc.taskId}</a></span>` : ''}
+                        <span>📅 ${formatDate(doc.createdAt)}</span>
+                    </div>
+                    <div class="doc-content-preview">${escapeHtml(doc.content.substring(0, 200))}${doc.content.length > 200 ? '...' : ''}</div>
+                    <div class="doc-actions">
+                        <button class="btn btn-info btn-sm" onclick="viewDoc(${doc.id})">查看</button>
+                        <button class="btn btn-warning btn-sm" onclick="openEditModal(${doc.id}, ${escapeJsString(doc.title)}, ${escapeJsString(doc.content)})">编辑</button>
+                        <button class="btn btn-danger btn-sm" onclick="openDeleteModal(${doc.id})">删除</button>
+                    </div>
+                </li>
+            `).join('');
+        }
+
+        function renderPagination(total, pages, current) {
+            const pagination = document.getElementById('pagination');
+            if (pages <= 1) { pagination.innerHTML = ''; return; }
+            pagination.innerHTML = `
+                <button onclick="goToPage(${current - 1})" ${current === 0 ? 'disabled' : ''}>上一页</button>
+                <span class="page-info">第 ${current + 1} / ${pages} 页 (共 ${total} 条)</span>
+                <button onclick="goToPage(${current + 1})" ${current >= pages - 1 ? 'disabled' : ''}>下一页</button>
+            `;
+        }
+
+        function goToPage(page) { currentPage = page; loadDocs(); }
+        function formatDate(dateStr) { if (!dateStr) return ''; return new Date(dateStr).toLocaleString('zh-CN'); }
+        function escapeHtml(text) { if (!text) return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+        function escapeJsString(text) { if (!text) return "''"; return "'" + text.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\n/g, '\\n').replace(/\r/g, '\\r') + "'"; }
+        function getIdentityTypeBadge(creator) {
+            if (!creator) return '';
+            const typeMap = { 'PM': '产品经理', 'OPS': '运维', 'DEV': '开发', 'QA': '测试' };
+            const type = creator.split('-')[0];
+            const typeName = typeMap[type] || type;
+            return `<span class="identity-type identity-${type}">${typeName}</span>`;
+        }
+
+        function filterByTaskId() {
+            const taskId = document.getElementById('taskIdFilter').value.trim();
+            currentTaskId = taskId ? parseInt(taskId) : null;
+            currentPage = 0;
+            loadDocs();
+        }
+        function clearFilter() {
+            document.getElementById('taskIdFilter').value = '';
+            currentTaskId = null;
+            currentPage = 0;
+            loadDocs();
+        }
+
+        async function loadTasks() {
+            try {
+                const response = await fetch('/api/tasks?size=100', { headers: getHeaders() });
+                const data = await response.json();
+                const select = document.getElementById('taskId');
+                select.innerHTML = '<option value="">无</option>' + data.content.map(t => `<option value="${t.id}">#${t.id} - ${escapeHtml(t.content.substring(0, 50))}${t.content.length > 50 ? '...' : ''}</option>`).join('');
+            } catch (error) { console.error('加载任务列表失败'); }
+        }
+
+        document.getElementById('createForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('title').value.trim();
+            const content = document.getElementById('content').value.trim();
+            const taskId = document.getElementById('taskId').value;
+            if (!title || !content) { showToast('请填写标题和内容', true); return; }
+            if (!getApiKey()) { showToast('请先输入 API Key', true); return; }
+            try {
+                const body = { title, content };
+                if (taskId) body.taskId = parseInt(taskId);
+                const response = await fetch(API_BASE, {
+                    method: 'POST',
+                    headers: getHeaders(),
+                    body: JSON.stringify(body)
+                });
+                if (response.ok) { showToast('设计文档创建成功'); document.getElementById('createForm').reset(); currentPage = 0; loadDocs(); }
+                else { const error = await response.json(); showToast(error.message || '创建失败', true); }
+            } catch (error) { showToast('创建设计文档失败', true); }
+        });
+
+        async function viewDoc(id) {
+            try {
+                const response = await fetch(`${API_BASE}/${id}`, { headers: getHeaders() });
+                if (response.ok) {
+                    const doc = await response.json();
+                    document.getElementById('viewTitle').textContent = doc.title;
+                    document.getElementById('viewMeta').innerHTML = `
+                        <span>👤 ${escapeHtml(doc.creator)}${getIdentityTypeBadge(doc.creator)}</span>
+                        ${doc.taskId ? `<span>📋 关联任务 #${doc.taskId}</span>` : ''}
+                        <span>📅 ${formatDate(doc.createdAt)}</span>
+                    `;
+                    document.getElementById('viewContent').textContent = doc.content;
+                    document.getElementById('viewModal').classList.add('active');
+                } else { showToast('获取设计文档失败', true); }
+            } catch (error) { showToast('获取设计文档失败', true); }
+        }
+        function closeViewModal() { document.getElementById('viewModal').classList.remove('active'); }
+
+        function openEditModal(id, title, content) {
+            currentDocId = id;
+            document.getElementById('editTitle').value = title || '';
+            document.getElementById('editContent').value = content || '';
+            document.getElementById('editModal').classList.add('active');
+        }
+        function closeEditModal() { document.getElementById('editModal').classList.remove('active'); currentDocId = null; }
+
+        async function confirmEdit() {
+            if (!currentDocId) return;
+            const title = document.getElementById('editTitle').value.trim();
+            const content = document.getElementById('editContent').value.trim();
+            if (!title || !content) { showToast('标题和内容不能为空', true); return; }
+            try {
+                const response = await fetch(`${API_BASE}/${currentDocId}`, {
+                    method: 'PUT',
+                    headers: getHeaders(),
+                    body: JSON.stringify({ title, content })
+                });
+                if (response.ok) { showToast('设计文档已更新'); closeEditModal(); loadDocs(); }
+                else { const error = await response.json(); showToast(error.message || '操作失败', true); }
+            } catch (error) { showToast('操作失败', true); }
+        }
+
+        function openDeleteModal(id) {
+            currentDocId = id;
+            document.getElementById('deleteModal').classList.add('active');
+        }
+        function closeDeleteModal() { document.getElementById('deleteModal').classList.remove('active'); currentDocId = null; }
+
+        async function confirmDelete() {
+            if (!currentDocId) return;
+            try {
+                const response = await fetch(`${API_BASE}/${currentDocId}`, {
+                    method: 'DELETE',
+                    headers: getHeaders()
+                });
+                if (response.ok) { showToast('设计文档已删除'); closeDeleteModal(); loadDocs(); }
+                else { const error = await response.json(); showToast(error.message || '删除失败', true); }
+            } catch (error) { showToast('删除失败', true); }
+        }
+
+        loadTasks();
+        loadDocs();
+    </script>
+</body>
+</html>
