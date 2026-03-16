@@ -43,6 +43,9 @@ class TaskServiceTest {
     @Mock
     private ProjectRepository projectRepository;
 
+    @Mock
+    private DesignDocService designDocService;
+
     @InjectMocks
     private TaskService taskService;
 
@@ -267,7 +270,7 @@ class TaskServiceTest {
     }
 
     @Test
-    @DisplayName("完成任务 - DEV完成时创建QA测试任务")
+    @DisplayName("完成任务 - DEV完成时创建QA测试任务和设计文档")
     void completeTask_DEV_CreatesQaTask() {
         // Arrange
         TaskCompleteRequest request = new TaskCompleteRequest();
@@ -290,6 +293,9 @@ class TaskServiceTest {
         assertThat(response.getStatus()).isEqualTo(TaskStatus.COMPLETED);
         // 验证创建了两个任务：原始任务完成 + 新的QA任务
         verify(taskRepository, times(2)).save(any(Task.class));
+        // 验证创建了设计文档
+        verify(designDocService, times(1)).createDocForTask(
+                eq(1L), eq("任务#1 设计文档"), eq("设计内容：模块拆解和实现方案"), eq("DEV-2"));
     }
 
     @Test

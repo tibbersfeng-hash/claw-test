@@ -25,11 +25,13 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final IdentityRepository identityRepository;
     private final ProjectRepository projectRepository;
+    private final DesignDocService designDocService;
 
-    public TaskService(TaskRepository taskRepository, IdentityRepository identityRepository, ProjectRepository projectRepository) {
+    public TaskService(TaskRepository taskRepository, IdentityRepository identityRepository, ProjectRepository projectRepository, DesignDocService designDocService) {
         this.taskRepository = taskRepository;
         this.identityRepository = identityRepository;
         this.projectRepository = projectRepository;
+        this.designDocService = designDocService;
     }
 
     @Transactional
@@ -111,9 +113,10 @@ public class TaskService {
 
         Task savedTask = taskRepository.save(task);
 
-        // DEV完成任务时，创建QA测试任务
+        // DEV完成任务时，创建QA测试任务和设计文档
         if (identity.getType() == IdentityType.DEV && request.getDesignContent() != null && !request.getDesignContent().trim().isEmpty()) {
             createQaTestTask(task, request.getDesignContent(), identity);
+            createDesignDoc(task, request.getDesignContent(), identity);
         }
 
         return fillProjectName(TaskResponse.fromEntity(savedTask));
@@ -137,6 +140,11 @@ public class TaskService {
                 .ifPresent(qa -> qaTask.setHandler(getCreatorName(qa)));
 
         taskRepository.save(qaTask);
+    }
+
+    private void createDesignDoc(Task originalTask, String designContent, Identity devIdentity) {
+        String title = "任务#" + originalTask.getId() + " 设计文档";
+        designDocService.createDocForTask(originalTask.getId(), title, designContent, getCreatorName(devIdentity));
     }
 
     @Transactional
