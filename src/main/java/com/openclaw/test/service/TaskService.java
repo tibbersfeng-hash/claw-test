@@ -46,12 +46,6 @@ public class TaskService {
                     .ifPresent(dev -> task.setHandler(getCreatorName(dev)));
         }
 
-        // DEV创建的任务，自动分配QA作为处理人
-        if (identity.getType() == IdentityType.DEV) {
-            identityRepository.findFirstByTypeOrderByIdAsc(IdentityType.QA)
-                    .ifPresent(qa -> task.setHandler(getCreatorName(qa)));
-        }
-
         Task savedTask = taskRepository.save(task);
         return fillProjectName(TaskResponse.fromEntity(savedTask));
     }
@@ -104,7 +98,7 @@ public class TaskService {
     }
 
     @Transactional
-    public TaskResponse completeTask(Long id, TaskCompleteRequest request) {
+    public TaskResponse completeTask(Long id, TaskCompleteRequest request, Identity identity) {
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new TaskNotFoundException(id));
 
@@ -116,7 +110,33 @@ public class TaskService {
         task.setRemark(request.getRemark());
 
         Task savedTask = taskRepository.save(task);
+
+        // DEV完成任务时，创建QA测试任务
+        if (identity.getType() == IdentityType.DEV && request.getDesignContent() != null && !request.getDesignContent().trim().isEmpty()) {
+            createQaTestTask(task, request.getDesignContent(), identity);
+        }
+
         return fillProjectName(TaskResponse.fromEntity(savedTask));
+    }
+
+    private void createQaTestTask(Task originalTask, String designContent, Identity devIdentity) {
+        Task qaTask = new Task();
+
+        StringBuilder content = new StringBuilder();
+        content.append("【测试任务】\n");
+        content.append("原始任务: ").append(originalTask.getContent()).append("\n\n");
+        content.append("开发设计:\n").append(designContent);
+
+        qaTask.setContent(content.toString());
+        qaTask.setCreator(getCreatorName(devIdentity));
+        qaTask.setProjectId(originalTask.getProjectId());
+        qaTask.setStatus(TaskStatus.INIT);
+
+        // 分配QA作为处理人
+        identityRepository.findFirstByTypeOrderByIdAsc(IdentityType.QA)
+                .ifPresent(qa -> qaTask.setHandler(getCreatorName(qa)));
+
+        taskRepository.save(qaTask);
     }
 
     @Transactional

@@ -65,8 +65,10 @@ public class TaskController {
     @PutMapping("/{id}/complete")
     public ResponseEntity<TaskResponse> completeTask(
             @PathVariable Long id,
-            @Valid @RequestBody TaskCompleteRequest request) {
-        TaskResponse response = taskService.completeTask(id, request);
+            @Valid @RequestBody TaskCompleteRequest request,
+            HttpServletRequest httpRequest) {
+        Identity identity = (Identity) httpRequest.getAttribute(AuthInterceptor.IDENTITY_ATTRIBUTE);
+        TaskResponse response = taskService.completeTask(id, request, identity);
         return ResponseEntity.ok(response);
     }
 
