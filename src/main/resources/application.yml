@@ -7,7 +7,7 @@ spring:
     name: claw-test
 
   datasource:
-    url: jdbc:sqlite:/tmp/claw-test/tasks.db
+    url: jdbc:sqlite:/opt/codegspace/claw-test/data/tasks.db
     driver-class-name: org.sqlite.JDBC
 
   jpa:
@@ -21,7 +21,7 @@ logging:
     root: INFO
     com.openclaw: DEBUG
   file:
-    name: /tmp/claw-test/claw-test.log
+    name: /opt/codegspace/claw-test/logs/claw-test.log
     max-size: 10MB
     max-history: 30
   pattern:
