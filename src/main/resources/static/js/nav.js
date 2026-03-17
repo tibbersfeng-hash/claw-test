@@ -13,7 +13,7 @@ const NAV_CONFIG = {
         { href: '/projects.html', label: '项目管理', icon: '📁' },
         { href: '/design-docs.html', label: '设计文档', icon: '📄' }
     ],
-    defaultApiKey: 'sk-9800eb048ad0446b8030e262efad9498'
+    defaultApiKey: ''
 };
 
 // 导出配置供其他脚本使用
