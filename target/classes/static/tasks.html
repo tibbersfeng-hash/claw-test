@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>任务管理</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; min-height: 100vh; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; }
+        h1 { color: #333; margin-bottom: 20px; text-align: center; }
+        .nav { margin-bottom: 20px; text-align: center; }
+        .nav a { color: #4a90d9; text-decoration: none; margin: 0 10px; }
+        .nav a:hover { text-decoration: underline; }
+        .card { background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 20px; margin-bottom: 20px; }
+        .card-title { font-size: 18px; font-weight: 600; color: #333; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; color: #666; font-size: 14px; }
+        .form-group input, .form-group textarea { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; transition: border-color 0.2s; }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #4a90d9; }
+        .form-group textarea { resize: vertical; min-height: 100px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+        .btn-primary { background: #4a90d9; color: white; }
+        .btn-primary:hover { background: #357abd; }
+        .btn-success { background: #52c41a; color: white; }
+        .btn-success:hover { background: #389e0d; }
+        .btn-warning { background: #fa8c16; color: white; }
+        .btn-warning:hover { background: #d46b08; }
+        .btn-danger { background: #ff4d4f; color: white; }
+        .btn-danger:hover { background: #d9363e; }
+        .btn-info { background: #722ed1; color: white; }
+        .btn-info:hover { background: #531dab; }
+        .btn-sm { padding: 6px 12px; font-size: 12px; }
+        .filter-bar { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
+        .filter-bar select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+        .task-list { list-style: none; }
+        .task-item { padding: 15px; border: 1px solid #eee; border-radius: 6px; margin-bottom: 10px; }
+        .task-item:hover { border-color: #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .task-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+        .task-content { font-size: 16px; color: #333; flex: 1; margin-right: 10px; white-space: pre-wrap; word-break: break-word; }
+        .task-meta { display: flex; gap: 15px; font-size: 12px; color: #999; margin-bottom: 10px; }
+        .task-remark { font-size: 14px; color: #666; background: #f9f9f9; padding: 8px 10px; border-radius: 4px; margin-top: 10px; }
+        .task-actions { margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; }
+        .status { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+        .status-INIT { background: #e6f7ff; color: #1890ff; }
+        .status-IN_PROGRESS { background: #fff7e6; color: #fa8c16; }
+        .status-COMPLETED { background: #f6ffed; color: #52c41a; }
+        .identity-type { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; margin-left: 6px; }
+        .identity-PM { background: #f0f5ff; color: #2f54eb; }
+        .identity-OPS { background: #fff1f0; color: #f5222d; }
+        .identity-DEV { background: #f6ffed; color: #52c41a; }
+        .identity-QA { background: #fff0f6; color: #eb2f96; }
+        .pagination { display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
+        .pagination button { padding: 8px 15px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; }
+        .pagination button:hover:not(:disabled) { background: #f5f5f5; }
+        .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .pagination .page-info { padding: 8px 15px; color: #666; }
+        .empty-state { text-align: center; padding: 40px; color: #999; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; padding: 20px; border-radius: 8px; width: 90%; max-width: 500px; }
+        .modal-content.large { max-width: 800px; max-height: 80vh; overflow-y: auto; }
+        .modal-header { font-size: 18px; font-weight: 600; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .modal-close { font-size: 24px; cursor: pointer; color: #999; }
+        .modal-close:hover { color: #333; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+        .btn-cancel { background: #f5f5f5; color: #666; }
+        .btn-cancel:hover { background: #e8e8e8; }
+        .toast { position: fixed; top: 20px; right: 20px; padding: 12px 20px; background: #52c41a; color: white; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transform: translateX(120%); transition: transform 0.3s; z-index: 1001; }
+        .toast.show { transform: translateX(0); }
+        .toast.error { background: #ff4d4f; }
+        .api-key-section { background: #e6f7ff; padding: 15px; border-radius: 6px; margin-bottom: 20px; }
+        .api-key-section label { font-weight: 600; color: #1890ff; }
+        .api-key-section input { margin-top: 8px; }
+        .api-key-hint { font-size: 12px; color: #666; margin-top: 5px; }
+        .hint-text { font-size: 12px; color: #999; margin-top: 4px; }
+        .markdown-content { background: #fafafa; padding: 15px; border-radius: 6px; border: 1px solid #eee; white-space: pre-wrap; word-break: break-word; font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace; font-size: 13px; line-height: 1.6; max-height: 400px; overflow-y: auto; }
+        .design-doc-item { padding: 12px; border: 1px solid #eee; border-radius: 6px; margin-bottom: 10px; }
+        .design-doc-item:hover { border-color: #ddd; background: #fafafa; }
+        .design-doc-title { font-weight: 600; color: #333; margin-bottom: 8px; }
+        .design-doc-meta { font-size: 12px; color: #999; margin-bottom: 8px; }
+        .design-doc-preview { font-size: 13px; color: #666; background: #f5f5f5; padding: 10px; border-radius: 4px; max-height: 100px; overflow: hidden; text-overflow: ellipsis; }
+        .design-doc-actions { margin-top: 8px; display: flex; gap: 8px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📋 任务管理</h1>
+        <div class="nav">
+            <a href="/tasks.html">任务管理</a>
+            <a href="/identities.html">身份管理</a>
+            <a href="/projects.html">项目管理</a>
+            <a href="/design-docs.html">设计文档</a>
+        </div>
+
+        <!-- API Key 认证 -->
+        <div class="api-key-section">
+            <label for="apiKey">🔑 API Key 认证</label>
+            <input type="text" id="apiKey" placeholder="请输入 API Key (从身份管理页面获取)" value="sk-9800eb048ad0446b8030e262efad9498">
+            <div class="api-key-hint">提示：请先在身份管理页面创建身份并获取 API Key</div>
+        </div>
+
+        <!-- 创建任务 -->
+        <div class="card">
+            <div class="card-title">创建任务</div>
+            <form id="createForm">
+                <div class="form-group">
+                    <label for="content">任务内容</label>
+                    <textarea id="content" placeholder="请输入任务内容（支持多行）" required maxlength="1000"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="projectId">关联项目</label>
+                    <select id="projectId">
+                        <option value="">无</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">创建任务</button>
+            </form>
+        </div>
+
+        <!-- 任务列表 -->
+        <div class="card">
+            <div class="card-title">任务列表</div>
+            <div class="filter-bar">
+                <label>状态筛选：</label>
+                <select id="statusFilter">
+                    <option value="">全部</option>
+                    <option value="INIT">初始化</option>
+                    <option value="IN_PROGRESS">进行中</option>
+                    <option value="COMPLETED">已完成</option>
+                </select>
+                <label style="margin-left: 15px;">创建者筛选：</label>
+                <select id="creatorTypeFilter">
+                    <option value="">全部</option>
+                    <option value="PM">产品经理</option>
+                    <option value="OPS">运维</option>
+                    <option value="DEV">开发</option>
+                    <option value="QA">测试</option>
+                </select>
+                <label style="margin-left: 15px;">处理人筛选：</label>
+                <select id="handlerTypeFilter">
+                    <option value="">全部</option>
+                    <option value="PM">产品经理</option>
+                    <option value="OPS">运维</option>
+                    <option value="DEV">开发</option>
+                    <option value="QA">测试</option>
+                </select>
+            </div>
+            <ul class="task-list" id="taskList"></ul>
+            <div class="pagination" id="pagination"></div>
+        </div>
+    </div>
+
+    <!-- 修改任务模态框 -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">修改任务内容</div>
+            <div class="form-group">
+                <label for="editContent">任务内容</label>
+                <textarea id="editContent" placeholder="请输入任务内容（支持多行）" maxlength="1000"></textarea>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="closeEditModal()">取消</button>
+                <button class="btn btn-primary" onclick="confirmEdit()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 完成任务模态框 -->
+    <div class="modal" id="completeModal">
+        <div class="modal-content">
+            <div class="modal-header">完成任务</div>
+            <div class="form-group">
+                <label for="remark">完成备注</label>
+                <textarea id="remark" placeholder="请输入完成备注（可选）" maxlength="500"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="designContent">设计内容（Markdown格式）</label>
+                <textarea id="designContent" placeholder="请输入设计内容，支持 Markdown 格式&#10;&#10;示例：&#10;# 模块设计&#10;&#10;## 概述&#10;功能说明...&#10;&#10;## 实现方案&#10;1. 步骤一&#10;2. 步骤二" maxlength="10000" style="min-height: 200px;"></textarea>
+                <div class="hint-text">DEV完成任务时填写设计内容，将自动创建设计文档</div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="closeCompleteModal()">取消</button>
+                <button class="btn btn-success" onclick="confirmComplete()">确认完成</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 删除任务模态框 -->
+    <div class="modal" id="deleteModal">
+        <div class="modal-content">
+            <div class="modal-header">确认删除</div>
+            <p>确定要删除该任务吗？此操作不可恢复。</p>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="closeDeleteModal()">取消</button>
+                <button class="btn btn-danger" onclick="confirmDelete()">确认删除</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 设计文档列表模态框 -->
+    <div class="modal" id="designDocsModal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <span>📄 设计文档</span>
+                <span class="modal-close" onclick="closeDesignDocsModal()">&times;</span>
+            </div>
+            <div id="designDocsList"></div>
+        </div>
+    </div>
+
+    <!-- 设计文档详情模态框 -->
+    <div class="modal" id="designDocDetailModal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <span id="docDetailTitle">设计文档详情</span>
+                <span class="modal-close" onclick="closeDesignDocDetailModal()">&times;</span>
+            </div>
+            <div class="form-group">
+                <label>创建者：<span id="docDetailCreator"></span></label>
+            </div>
+            <div class="form-group">
+                <label>创建时间：<span id="docDetailCreatedAt"></span></label>
+            </div>
+            <div class="form-group">
+                <label>内容</label>
+                <div class="markdown-content" id="docDetailContent"></div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="closeDesignDocDetailModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const API_BASE = '/api/tasks';
+        const DESIGN_DOC_API = '/api/design-docs';
+        let currentPage = 0;
+        let currentStatus = '';
+        let currentTaskId = null;
+
+        function getApiKey() { return document.getElementById('apiKey').value.trim(); }
+
+        function getHeaders() {
+            const apiKey = getApiKey();
+            const headers = { 'Content-Type': 'application/json' };
+            if (apiKey) headers['X-API-Key'] = apiKey;
+            return headers;
+        }
+
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show' + (isError ? ' error' : '');
+            setTimeout(() => { toast.className = 'toast'; }, 3000);
+        }
+
+        async function loadTasks() {
+            const typeFilter = document.getElementById('statusFilter').value;
+            const creatorTypeFilter = document.getElementById('creatorTypeFilter').value;
+            const handlerTypeFilter = document.getElementById('handlerTypeFilter').value;
+            currentStatus = typeFilter;
+            let url = `${API_BASE}?page=${currentPage}&size=10`;
+            if (typeFilter) url += `&status=${typeFilter}`;
+            if (creatorTypeFilter) url += `&creatorType=${creatorTypeFilter}`;
+            if (handlerTypeFilter) url += `&handlerType=${handlerTypeFilter}`;
+            try {
+                const response = await fetch(url, { headers: getHeaders() });
+                if (response.status === 401) { showToast('请先输入有效的 API Key', true); return; }
+                const data = await response.json();
+                renderTasks(data.content);
+                renderPagination(data.totalElements, data.totalPages, data.number);
+            } catch (error) { showToast('加载任务列表失败', true); }
+        }
+
+        function renderTasks(tasks) {
+            const taskList = document.getElementById('taskList');
+            if (tasks.length === 0) { taskList.innerHTML = '<div class="empty-state">暂无任务</div>'; return; }
+            taskList.innerHTML = tasks.map(task => `
+                <li class="task-item">
+                    <div class="task-header">
+                        <div class="task-content">${escapeHtml(task.content)}</div>
+                        <span class="status status-${task.status}">${getStatusText(task.status)}</span>
+                    </div>
+                    <div class="task-meta">
+                        <span>👤 ${escapeHtml(task.creator)}${getIdentityTypeBadge(task.creator)}</span>
+                        ${task.handler ? `<span>🔧 ${escapeHtml(task.handler)}${getIdentityTypeBadge(task.handler)}</span>` : ''}
+                        ${task.projectName ? `<span>📁 ${escapeHtml(task.projectName)}</span>` : ''}
+                        <span>📅 ${formatDate(task.createdAt)}</span>
+                    </div>
+                    ${task.remark ? `<div class="task-remark">📝 ${escapeHtml(task.remark)}</div>` : ''}
+                    <div class="task-actions">
+                        <button class="btn btn-warning btn-sm" onclick="openEditModal(${task.id}, ${escapeJsString(task.content)})">修改内容</button>
+                        ${task.status === 'INIT' ? `<button class="btn btn-primary btn-sm" onclick="startTask(${task.id})">开始任务</button>` : ''}
+                        ${task.status !== 'COMPLETED' ? `<button class="btn btn-success btn-sm" onclick="openCompleteModal(${task.id})">完成任务</button>` : ''}
+                        <button class="btn btn-info btn-sm" onclick="openDesignDocsModal(${task.id})">设计文档</button>
+                        <button class="btn btn-danger btn-sm" onclick="openDeleteModal(${task.id})">删除</button>
+                    </div>
+                </li>
+            `).join('');
+        }
+
+        function renderPagination(total, pages, current) {
+            const pagination = document.getElementById('pagination');
+            if (pages <= 1) { pagination.innerHTML = ''; return; }
+            pagination.innerHTML = `
+                <button onclick="goToPage(${current - 1})" ${current === 0 ? 'disabled' : ''}>上一页</button>
+                <span class="page-info">第 ${current + 1} / ${pages} 页 (共 ${total} 条)</span>
+                <button onclick="goToPage(${current + 1})" ${current >= pages - 1 ? 'disabled' : ''}>下一页</button>
+            `;
+        }
+
+        function goToPage(page) { currentPage = page; loadTasks(); }
+        function getStatusText(status) { return { 'INIT': '初始化', 'IN_PROGRESS': '进行中', 'COMPLETED': '已完成' }[status] || status; }
+        function getIdentityTypeBadge(creator) {
+            if (!creator) return '';
+            const typeMap = { 'PM': '产品经理', 'OPS': '运维', 'DEV': '开发', 'QA': '测试' };
+            const type = creator.split('-')[0];
+            const typeName = typeMap[type] || type;
+            return `<span class="identity-type identity-${type}">${typeName}</span>`;
+        }
+        function formatDate(dateStr) { if (!dateStr) return ''; return new Date(dateStr).toLocaleString('zh-CN'); }
+        function escapeHtml(text) { if (!text) return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+        function escapeJsString(text) { if (!text) return "''"; return "'" + text.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\n/g, '\\n').replace(/\r/g, '\\r') + "'"; }
+
+        document.getElementById('createForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const content = document.getElementById('content').value.trim();
+            const projectId = document.getElementById('projectId').value;
+            if (!content) { showToast('请填写任务内容', true); return; }
+            if (!getApiKey()) { showToast('请先输入 API Key', true); return; }
+            try {
+                const body = { content };
+                if (projectId) body.projectId = parseInt(projectId);
+                const response = await fetch(API_BASE, {
+                    method: 'POST',
+                    headers: getHeaders(),
+                    body: JSON.stringify(body)
+                });
+                if (response.ok) { showToast('任务创建成功'); document.getElementById('createForm').reset(); loadProjects(); currentPage = 0; loadTasks(); }
+                else { const error = await response.json(); showToast(error.message || '创建失败', true); }
+            } catch (error) { showToast('创建任务失败', true); }
+        });
+
+        document.getElementById('statusFilter').addEventListener('change', () => { currentPage = 0; loadTasks(); });
+
+        document.getElementById('creatorTypeFilter').addEventListener('change', () => { currentPage = 0; loadTasks(); });
+
+        document.getElementById('handlerTypeFilter').addEventListener('change', () => { currentPage = 0; loadTasks(); });
+
+        function openEditModal(taskId, content) {
+            currentTaskId = taskId;
+            document.getElementById('editContent').value = content || '';
+            document.getElementById('editModal').classList.add('active');
+        }
+        function closeEditModal() { document.getElementById('editModal').classList.remove('active'); currentTaskId = null; }
+
+        async function confirmEdit() {
+            if (!currentTaskId) return;
+            const content = document.getElementById('editContent').value.trim();
+            if (!content) { showToast('任务内容不能为空', true); return; }
+            try {
+                const response = await fetch(`${API_BASE}/${currentTaskId}`, {
+                    method: 'PUT',
+                    headers: getHeaders(),
+                    body: JSON.stringify({ content })
+                });
+                if (response.ok) { showToast('任务内容已修改'); closeEditModal(); loadTasks(); }
+                else { const error = await response.json(); showToast(error.message || '操作失败', true); }
+            } catch (error) { showToast('操作失败', true); }
+        }
+
+        function openCompleteModal(taskId) {
+            currentTaskId = taskId;
+            document.getElementById('remark').value = '';
+            document.getElementById('designContent').value = '';
+            document.getElementById('completeModal').classList.add('active');
+        }
+        function closeCompleteModal() { document.getElementById('completeModal').classList.remove('active'); currentTaskId = null; }
+
+        async function confirmComplete() {
+            if (!currentTaskId) return;
+            const remark = document.getElementById('remark').value.trim();
+            const designContent = document.getElementById('designContent').value.trim();
+            try {
+                const body = { remark };
+                if (designContent) body.designContent = designContent;
+                const response = await fetch(`${API_BASE}/${currentTaskId}/complete`, {
+                    method: 'PUT',
+                    headers: getHeaders(),
+                    body: JSON.stringify(body)
+                });
+                if (response.ok) {
+                    showToast('任务已完成' + (designContent ? '，设计文档已创建' : ''));
+                    closeCompleteModal();
+                    loadTasks();
+                }
+                else { const error = await response.json(); showToast(error.message || '操作失败', true); }
+            } catch (error) { showToast('操作失败', true); }
+        }
+
+        async function startTask(taskId) {
+            try {
+                const response = await fetch(`${API_BASE}/${taskId}/start`, {
+                    method: 'PUT',
+                    headers: getHeaders()
+                });
+                if (response.ok) { showToast('任务已开始'); loadTasks(); }
+                else { const error = await response.json(); showToast(error.message || '操作失败', true); }
+            } catch (error) { showToast('操作失败', true); }
+        }
+
+        function openDeleteModal(taskId) {
+            currentTaskId = taskId;
+            document.getElementById('deleteModal').classList.add('active');
+        }
+        function closeDeleteModal() { document.getElementById('deleteModal').classList.remove('active'); currentTaskId = null; }
+
+        async function confirmDelete() {
+            if (!currentTaskId) return;
+            try {
+                const response = await fetch(`${API_BASE}/${currentTaskId}`, {
+                    method: 'DELETE',
+                    headers: getHeaders()
+                });
+                if (response.ok) { showToast('任务已删除'); closeDeleteModal(); loadTasks(); }
+                else { const error = await response.json(); showToast(error.message || '删除失败', true); }
+            } catch (error) { showToast('删除失败', true); }
+        }
+
+        // 设计文档相关功能
+        async function openDesignDocsModal(taskId) {
+            currentTaskId = taskId;
+            document.getElementById('designDocsModal').classList.add('active');
+            await loadDesignDocs(taskId);
+        }
+        function closeDesignDocsModal() {
+            document.getElementById('designDocsModal').classList.remove('active');
+            currentTaskId = null;
+        }
+
+        async function loadDesignDocs(taskId) {
+            const listEl = document.getElementById('designDocsList');
+            listEl.innerHTML = '<div class="empty-state">加载中...</div>';
+            try {
+                const response = await fetch(`${DESIGN_DOC_API}?taskId=${taskId}`, { headers: getHeaders() });
+                if (response.status === 401) {
+                    listEl.innerHTML = '<div class="empty-state">请先输入有效的 API Key</div>';
+                    return;
+                }
+                const data = await response.json();
+                if (data.content.length === 0) {
+                    listEl.innerHTML = '<div class="empty-state">暂无设计文档</div>';
+                    return;
+                }
+                listEl.innerHTML = data.content.map(doc => `
+                    <div class="design-doc-item">
+                        <div class="design-doc-title">${escapeHtml(doc.title)}</div>
+                        <div class="design-doc-meta">
+                            <span>👤 ${escapeHtml(doc.creator)}</span>
+                            <span>📅 ${formatDate(doc.createdAt)}</span>
+                        </div>
+                        <div class="design-doc-preview">${escapeHtml(doc.content.substring(0, 200))}${doc.content.length > 200 ? '...' : ''}</div>
+                        <div class="design-doc-actions">
+                            <button class="btn btn-primary btn-sm" onclick="viewDesignDoc(${doc.id}, ${escapeJsString(doc.title)}, ${escapeJsString(doc.creator)}, '${doc.createdAt}', ${escapeJsString(doc.content)})">查看详情</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                listEl.innerHTML = '<div class="empty-state">加载失败</div>';
+            }
+        }
+
+        function viewDesignDoc(id, title, creator, createdAt, content) {
+            document.getElementById('docDetailTitle').textContent = title;
+            document.getElementById('docDetailCreator').textContent = creator;
+            document.getElementById('docDetailCreatedAt').textContent = formatDate(createdAt);
+            document.getElementById('docDetailContent').textContent = content;
+            document.getElementById('designDocDetailModal').classList.add('active');
+        }
+        function closeDesignDocDetailModal() {
+            document.getElementById('designDocDetailModal').classList.remove('active');
+        }
+
+        async function loadProjects() {
+            try {
+                const response = await fetch('/api/projects?size=100');
+                const data = await response.json();
+                const select = document.getElementById('projectId');
+                select.innerHTML = '<option value="">无</option>' + data.content.map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
+            } catch (error) { console.error('加载项目列表失败'); }
+        }
+
+        loadProjects();
+        loadTasks();
+    </script>
+</body>
+</html>

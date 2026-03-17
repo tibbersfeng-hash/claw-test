@@ -1,0 +1,4 @@
+com/openclaw/test/service/IdentityServiceTest.class
+com/openclaw/test/service/DesignDocServiceTest.class
+com/openclaw/test/service/ProjectServiceTest.class
+com/openclaw/test/service/TaskServiceTest.class
