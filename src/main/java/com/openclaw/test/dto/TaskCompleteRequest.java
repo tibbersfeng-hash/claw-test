@@ -4,11 +4,14 @@ import jakarta.validation.constraints.Size;
 
 public class TaskCompleteRequest {
 
-    @Size(max = 500, message = "完成备注最大500字符")
+    @Size(max = 2000, message = "完成备注最大2000字符")
     private String remark;
 
-    @Size(max = 2000, message = "设计内容最大2000字符")
-    private String designContent;
+    private String imageUrls;
+
+    private String extraData;
+
+    private Boolean createNextTask = true;
 
     public String getRemark() {
         return remark;
@@ -18,11 +21,27 @@ public class TaskCompleteRequest {
         this.remark = remark;
     }
 
-    public String getDesignContent() {
-        return designContent;
+    public String getImageUrls() {
+        return imageUrls;
     }
 
-    public void setDesignContent(String designContent) {
-        this.designContent = designContent;
+    public void setImageUrls(String imageUrls) {
+        this.imageUrls = imageUrls;
+    }
+
+    public String getExtraData() {
+        return extraData;
+    }
+
+    public void setExtraData(String extraData) {
+        this.extraData = extraData;
+    }
+
+    public Boolean getCreateNextTask() {
+        return createNextTask;
+    }
+
+    public void setCreateNextTask(Boolean createNextTask) {
+        this.createNextTask = createNextTask;
     }
 }

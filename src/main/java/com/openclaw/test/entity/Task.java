@@ -24,9 +24,30 @@ public class Task {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private TaskStatus status = TaskStatus.INIT;
+    private TaskStatus status = TaskStatus.PENDING;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TaskType taskType = TaskType.REQ;
+
+    private Long parentId;
+
+    @Column(length = 20)
+    private String assigneeRole;
+
+    @Column(length = 10)
+    private Integer priority = 0;
 
     @Column(length = 500)
+    private String tags;
+
+    @Column(columnDefinition = "TEXT")
+    private String imageUrls;
+
+    @Column(columnDefinition = "TEXT")
+    private String extraData;
+
+    @Column(length = 2000)
     private String remark;
 
     @Column(nullable = false, updatable = false)
@@ -39,6 +60,12 @@ public class Task {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
+        if (status == null) {
+            status = TaskStatus.PENDING;
+        }
+        if (taskType == null) {
+            taskType = TaskType.REQ;
+        }
     }
 
     @PreUpdate
@@ -93,6 +120,62 @@ public class Task {
 
     public void setStatus(TaskStatus status) {
         this.status = status;
+    }
+
+    public TaskType getTaskType() {
+        return taskType;
+    }
+
+    public void setTaskType(TaskType taskType) {
+        this.taskType = taskType;
+    }
+
+    public Long getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(Long parentId) {
+        this.parentId = parentId;
+    }
+
+    public String getAssigneeRole() {
+        return assigneeRole;
+    }
+
+    public void setAssigneeRole(String assigneeRole) {
+        this.assigneeRole = assigneeRole;
+    }
+
+    public Integer getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Integer priority) {
+        this.priority = priority;
+    }
+
+    public String getTags() {
+        return tags;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
+    }
+
+    public String getImageUrls() {
+        return imageUrls;
+    }
+
+    public void setImageUrls(String imageUrls) {
+        this.imageUrls = imageUrls;
+    }
+
+    public String getExtraData() {
+        return extraData;
+    }
+
+    public void setExtraData(String extraData) {
+        this.extraData = extraData;
     }
 
     public String getRemark() {

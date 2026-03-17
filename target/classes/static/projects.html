@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>项目管理</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; min-height: 100vh; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; }
+        h1 { color: #333; margin-bottom: 20px; text-align: center; }
+        .nav { margin-bottom: 20px; text-align: center; }
+        .nav a { color: #4a90d9; text-decoration: none; margin: 0 10px; }
+        .nav a:hover { text-decoration: underline; }
+        .card { background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 20px; margin-bottom: 20px; }
+        .card-title { font-size: 18px; font-weight: 600; color: #333; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; color: #666; font-size: 14px; }
+        .form-group input { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; transition: border-color 0.2s; }
+        .form-group input:focus { outline: none; border-color: #4a90d9; }
+        .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+        .btn-primary { background: #4a90d9; color: white; }
+        .btn-primary:hover { background: #357abd; }
+        .btn-success { background: #52c41a; color: white; }
+        .btn-success:hover { background: #389e0d; }
+        .btn-warning { background: #fa8c16; color: white; }
+        .btn-warning:hover { background: #d46b08; }
+        .btn-danger { background: #ff4d4f; color: white; }
+        .btn-danger:hover { background: #d9363e; }
+        .btn-sm { padding: 6px 12px; font-size: 12px; }
+        .filter-bar { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; margin-bottom: 15px; }
+        .filter-bar input { padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+        .project-list { list-style: none; }
+        .project-item { padding: 15px; border: 1px solid #eee; border-radius: 6px; margin-bottom: 10px; }
+        .project-item:hover { border-color: #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .project-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+        .project-name { font-size: 16px; color: #333; font-weight: 600; }
+        .project-meta { display: flex; flex-direction: column; gap: 5px; font-size: 13px; color: #666; margin-bottom: 10px; }
+        .project-meta a { color: #4a90d9; text-decoration: none; }
+        .project-meta a:hover { text-decoration: underline; }
+        .project-actions { display: flex; gap: 8px; }
+        .pagination { display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
+        .pagination button { padding: 8px 15px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; }
+        .pagination button:hover:not(:disabled) { background: #f5f5f5; }
+        .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .pagination .page-info { padding: 8px 15px; color: #666; }
+        .empty-state { text-align: center; padding: 40px; color: #999; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; padding: 20px; border-radius: 8px; width: 90%; max-width: 500px; }
+        .modal-header { font-size: 18px; font-weight: 600; margin-bottom: 15px; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+        .btn-cancel { background: #f5f5f5; color: #666; }
+        .btn-cancel:hover { background: #e8e8e8; }
+        .toast { position: fixed; top: 20px; right: 20px; padding: 12px 20px; background: #52c41a; color: white; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transform: translateX(120%); transition: transform 0.3s; z-index: 1001; }
+        .toast.show { transform: translateX(0); }
+        .toast.error { background: #ff4d4f; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📁 项目管理</h1>
+        <div class="nav">
+            <a href="/tasks.html">任务管理</a>
+            <a href="/identities.html">身份管理</a>
+            <a href="/projects.html">项目管理</a>
+            <a href="/design-docs.html">设计文档</a>
+        </div>
+
+        <!-- 创建项目 -->
+        <div class="card">
+            <div class="card-title">创建项目</div>
+            <form id="createForm">
+                <div class="form-group">
+                    <label for="name">项目名称 *</label>
+                    <input type="text" id="name" placeholder="请输入项目名称" required maxlength="100">
+                </div>
+                <div class="form-group">
+                    <label for="repoUrl">仓库地址</label>
+                    <input type="text" id="repoUrl" placeholder="例如: https://github.com/user/repo.git" maxlength="500">
+                </div>
+                <div class="form-group">
+                    <label for="projectPath">项目路径</label>
+                    <input type="text" id="projectPath" placeholder="例如: /opt/codegspace/my-project" maxlength="500">
+                </div>
+                <button type="submit" class="btn btn-primary">创建项目</button>
+            </form>
+        </div>
+
+        <!-- 项目列表 -->
+        <div class="card">
+            <div class="card-title">项目列表</div>
+            <div class="filter-bar">
+                <label>搜索：</label>
+                <input type="text" id="searchName" placeholder="按名称搜索...">
+            </div>
+            <ul class="project-list" id="projectList"></ul>
+            <div class="pagination" id="pagination"></div>
+        </div>
+    </div>
+
+    <!-- 编辑项目模态框 -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">编辑项目</div>
+            <div class="form-group">
+                <label for="editName">项目名称 *</label>
+                <input type="text" id="editName" required maxlength="100">
+            </div>
+            <div class="form-group">
+                <label for="editRepoUrl">仓库地址</label>
+                <input type="text" id="editRepoUrl" maxlength="500">
+            </div>
+            <div class="form-group">
+                <label for="editProjectPath">项目路径</label>
+                <input type="text" id="editProjectPath" maxlength="500">
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="closeEditModal()">取消</button>
+                <button class="btn btn-primary" onclick="confirmEdit()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 删除项目模态框 -->
+    <div class="modal" id="deleteModal">
+        <div class="modal-content">
+            <div class="modal-header">确认删除</div>
+            <p>确定要删除该项目吗？此操作不可恢复。</p>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="closeDeleteModal()">取消</button>
+                <button class="btn btn-danger" onclick="confirmDelete()">确认删除</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const API_BASE = '/api/projects';
+        let currentPage = 0;
+        let currentProjectId = null;
+
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show' + (isError ? ' error' : '');
+            setTimeout(() => { toast.className = 'toast'; }, 3000);
+        }
+
+        async function loadProjects() {
+            const name = document.getElementById('searchName').value.trim();
+            let url = `${API_BASE}?page=${currentPage}&size=10`;
+            if (name) url += `&name=${encodeURIComponent(name)}`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                renderProjects(data.content);
+                renderPagination(data.totalElements, data.totalPages, data.number);
+            } catch (error) {
+                showToast('加载项目列表失败', true);
+            }
+        }
+
+        function renderProjects(projects) {
+            const projectList = document.getElementById('projectList');
+            if (projects.length === 0) {
+                projectList.innerHTML = '<div class="empty-state">暂无项目</div>';
+                return;
+            }
+            projectList.innerHTML = projects.map(project => `
+                <li class="project-item">
+                    <div class="project-header">
+                        <div class="project-name">${escapeHtml(project.name)}</div>
+                    </div>
+                    <div class="project-meta">
+                        ${project.repoUrl ? `<div>📦 仓库: <a href="${escapeHtml(project.repoUrl)}" target="_blank">${escapeHtml(project.repoUrl)}</a></div>` : ''}
+                        ${project.projectPath ? `<div>📂 路径: ${escapeHtml(project.projectPath)}</div>` : ''}
+                        <div>📅 创建时间: ${formatDate(project.createdAt)}</div>
+                    </div>
+                    <div class="project-actions">
+                        <button class="btn btn-warning btn-sm" onclick="openEditModal(${project.id}, '${escapeJsString(project.name)}', '${escapeJsString(project.repoUrl || '')}', '${escapeJsString(project.projectPath || '')}')">编辑</button>
+                        <button class="btn btn-danger btn-sm" onclick="openDeleteModal(${project.id})">删除</button>
+                    </div>
+                </li>
+            `).join('');
+        }
+
+        function renderPagination(total, pages, current) {
+            const pagination = document.getElementById('pagination');
+            if (pages <= 1) { pagination.innerHTML = ''; return; }
+            pagination.innerHTML = `
+                <button onclick="goToPage(${current - 1})" ${current === 0 ? 'disabled' : ''}>上一页</button>
+                <span class="page-info">第 ${current + 1} / ${pages} 页 (共 ${total} 条)</span>
+                <button onclick="goToPage(${current + 1})" ${current >= pages - 1 ? 'disabled' : ''}>下一页</button>
+            `;
+        }
+
+        function goToPage(page) { currentPage = page; loadProjects(); }
+        function formatDate(dateStr) { if (!dateStr) return ''; return new Date(dateStr).toLocaleString('zh-CN'); }
+        function escapeHtml(text) { if (!text) return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+        function escapeJsString(text) { if (!text) return ''; return text.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\n/g, '\\n').replace(/\r/g, '\\r'); }
+
+        document.getElementById('createForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value.trim();
+            const repoUrl = document.getElementById('repoUrl').value.trim();
+            const projectPath = document.getElementById('projectPath').value.trim();
+            if (!name) { showToast('请填写项目名称', true); return; }
+
+            try {
+                const response = await fetch(API_BASE, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, repoUrl, projectPath })
+                });
+                if (response.ok) {
+                    showToast('项目创建成功');
+                    document.getElementById('createForm').reset();
+                    currentPage = 0;
+                    loadProjects();
+                } else {
+                    const error = await response.json();
+                    showToast(error.message || '创建失败', true);
+                }
+            } catch (error) {
+                showToast('创建项目失败', true);
+            }
+        });
+
+        document.getElementById('searchName').addEventListener('input', () => {
+            currentPage = 0;
+            loadProjects();
+        });
+
+        function openEditModal(id, name, repoUrl, projectPath) {
+            currentProjectId = id;
+            document.getElementById('editName').value = name || '';
+            document.getElementById('editRepoUrl').value = repoUrl || '';
+            document.getElementById('editProjectPath').value = projectPath || '';
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+            currentProjectId = null;
+        }
+
+        async function confirmEdit() {
+            if (!currentProjectId) return;
+            const name = document.getElementById('editName').value.trim();
+            const repoUrl = document.getElementById('editRepoUrl').value.trim();
+            const projectPath = document.getElementById('editProjectPath').value.trim();
+            if (!name) { showToast('项目名称不能为空', true); return; }
+
+            try {
+                const response = await fetch(`${API_BASE}/${currentProjectId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, repoUrl, projectPath })
+                });
+                if (response.ok) {
+                    showToast('项目已更新');
+                    closeEditModal();
+                    loadProjects();
+                } else {
+                    const error = await response.json();
+                    showToast(error.message || '操作失败', true);
+                }
+            } catch (error) {
+                showToast('操作失败', true);
+            }
+        }
+
+        function openDeleteModal(id) {
+            currentProjectId = id;
+            document.getElementById('deleteModal').classList.add('active');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('active');
+            currentProjectId = null;
+        }
+
+        async function confirmDelete() {
+            if (!currentProjectId) return;
+            try {
+                const response = await fetch(`${API_BASE}/${currentProjectId}`, { method: 'DELETE' });
+                if (response.ok) {
+                    showToast('项目已删除');
+                    closeDeleteModal();
+                    loadProjects();
+                } else {
+                    showToast('删除失败', true);
+                }
+            } catch (error) {
+                showToast('删除失败', true);
+            }
+        }
+
+        loadProjects();
+    </script>
+</body>
+</html>

@@ -8,6 +8,7 @@ import com.openclaw.test.dto.TaskUpdateRequest;
 import com.openclaw.test.entity.Identity;
 import com.openclaw.test.entity.IdentityType;
 import com.openclaw.test.entity.TaskStatus;
+import com.openclaw.test.entity.TaskType;
 import com.openclaw.test.service.TaskService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -15,6 +16,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/tasks")
@@ -40,19 +45,40 @@ public class TaskController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) TaskStatus status,
-            @RequestParam(required = false) IdentityType creatorType,
-            @RequestParam(required = false) IdentityType handlerType) {
+            @RequestParam(required = false) TaskType taskType,
+            @RequestParam(required = false) String assigneeRole) {
 
         size = Math.min(size, 100);
         page = Math.max(page, 0);
 
-        Page<TaskResponse> response = taskService.getTasks(page, size, status, creatorType, handlerType);
+        Page<TaskResponse> response = taskService.getTasks(page, size, status, taskType, assigneeRole);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<TaskResponse> getTaskById(@PathVariable Long id) {
         TaskResponse response = taskService.getTaskById(id);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Agent 拉取待办任务
+     * GET /api/tasks/todo?role=DEV
+     */
+    @GetMapping("/todo")
+    public ResponseEntity<TaskResponse> pullTodoTask(@RequestParam String role) {
+        Optional<TaskResponse> response = taskService.pullTodoTask(role);
+        return response
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.noContent().build());
+    }
+
+    /**
+     * 获取任务链（子任务列表）
+     */
+    @GetMapping("/{id}/chain")
+    public ResponseEntity<List<TaskResponse>> getTaskChain(@PathVariable Long id) {
+        List<TaskResponse> response = taskService.getTaskChain(id);
         return ResponseEntity.ok(response);
     }
 
@@ -69,6 +95,20 @@ public class TaskController {
             HttpServletRequest httpRequest) {
         Identity identity = (Identity) httpRequest.getAttribute(AuthInterceptor.IDENTITY_ATTRIBUTE);
         TaskResponse response = taskService.completeTask(id, request, identity);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 拒绝任务（验收不通过）
+     */
+    @PutMapping("/{id}/reject")
+    public ResponseEntity<TaskResponse> rejectTask(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> body,
+            HttpServletRequest httpRequest) {
+        Identity identity = (Identity) httpRequest.getAttribute(AuthInterceptor.IDENTITY_ATTRIBUTE);
+        String remark = body.get("remark");
+        TaskResponse response = taskService.rejectTask(id, remark, identity);
         return ResponseEntity.ok(response);
     }
 

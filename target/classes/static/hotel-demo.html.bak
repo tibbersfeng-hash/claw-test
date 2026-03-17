@@ -1,0 +1,2363 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>香格里拉酒店集团</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #C9A962;
+            --gold-light: #E8D5A3;
+            --gold-dark: #9A7B3A;
+            --navy: #1A365D;
+            --navy-deep: #0F2444;
+            --cream: #F8F6F3;
+            --charcoal: #2C2C2C;
+            --charcoal-light: #4A4A4A;
+            --white: #FFFFFF;
+            --border: #E5E5E5;
+            --success: #4CAF50;
+            --error: #E53935;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--cream);
+            color: var(--charcoal);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* Page System */
+        .page {
+            display: none;
+            min-height: 100vh;
+            background: var(--cream);
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        .nav.transparent {
+            background: transparent;
+        }
+
+        .nav.white {
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+
+        .nav-icon:active {
+            background: rgba(0,0,0,0.1);
+        }
+
+        .nav-icon svg {
+            width: 22px;
+            height: 22px;
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
+        }
+
+        .nav.transparent .nav-icon {
+            color: white;
+        }
+
+        .nav.white .nav-icon {
+            color: var(--charcoal);
+        }
+
+        .nav-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--charcoal);
+        }
+
+        .nav.transparent .nav-title {
+            color: white;
+        }
+
+        .nav-center {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-family: 'Playfair Display', serif;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .logo-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 15px;
+            letter-spacing: 0.08em;
+            font-weight: 500;
+        }
+
+        .nav.transparent .logo-text {
+            color: white;
+        }
+
+        .nav.white .logo-text {
+            color: var(--navy);
+        }
+
+        /* ========== Page 1: Home ========== */
+        .home-hero {
+            height: 100vh;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 56px 24px 200px;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .home-hero-bg {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.55) 100%),
+                        url('https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&h=1200&fit=crop') center/cover no-repeat;
+            z-index: -1;
+        }
+
+        .home-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 42px;
+            color: white;
+            margin-bottom: 12px;
+            font-weight: 400;
+            text-shadow: 0 2px 20px rgba(0,0,0,0.3);
+        }
+
+        .home-subtitle {
+            font-size: 13px;
+            color: rgba(255,255,255,0.9);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+
+        /* Booking Widget */
+        .booking-widget {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--white);
+            padding: 24px 20px 40px;
+            border-radius: 24px 24px 0 0;
+            box-shadow: 0 -8px 40px rgba(0,0,0,0.12);
+            z-index: 50;
+        }
+
+        .booking-widget-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--navy);
+        }
+
+        .booking-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .booking-field {
+            flex: 1;
+            background: var(--cream);
+            border-radius: 12px;
+            padding: 12px 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .booking-field:active {
+            background: var(--border);
+        }
+
+        .booking-field label {
+            display: block;
+            font-size: 11px;
+            color: var(--charcoal-light);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .booking-field .value {
+            font-size: 15px;
+            color: var(--charcoal);
+            font-weight: 500;
+        }
+
+        .booking-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(201,169,98,0.4);
+        }
+
+        .booking-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* ========== Page 2: Destination Select ========== */
+        .dest-page {
+            background: var(--white);
+            min-height: 100vh;
+            padding-bottom: 40px;
+        }
+
+        .dest-search {
+            padding: 72px 16px 16px;
+            background: var(--white);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 14px 16px 14px 48px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-size: 15px;
+            background: var(--cream) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") no-repeat 16px center;
+            background-size: 18px;
+            transition: border-color 0.2s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--gold);
+        }
+
+        .dest-tabs {
+            display: flex;
+            gap: 8px;
+            padding: 16px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .dest-tab {
+            padding: 8px 16px;
+            background: var(--cream);
+            border: none;
+            border-radius: 20px;
+            font-size: 14px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--charcoal-light);
+        }
+
+        .dest-tab.active {
+            background: var(--navy);
+            color: white;
+        }
+
+        .dest-list {
+            padding: 0 16px;
+        }
+
+        .dest-group-title {
+            font-size: 12px;
+            color: var(--charcoal-light);
+            padding: 20px 0 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .dest-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .dest-item:active {
+            background: var(--cream);
+            margin: 0 -16px;
+            padding-left: 16px;
+            padding-right: 16px;
+        }
+
+        .dest-item-info {
+            flex: 1;
+        }
+
+        .dest-item-name {
+            font-size: 17px;
+            font-weight: 500;
+            color: var(--charcoal);
+        }
+
+        .dest-item-count {
+            font-size: 13px;
+            color: var(--charcoal-light);
+            margin-top: 2px;
+        }
+
+        .dest-item-arrow {
+            color: var(--charcoal-light);
+            font-size: 20px;
+        }
+
+        /* ========== Page 3: Hotel List ========== */
+        .hotel-list-page {
+            padding: 56px 0 100px;
+            background: var(--cream);
+        }
+
+        .hotel-list-header {
+            position: sticky;
+            top: 56px;
+            background: var(--white);
+            z-index: 10;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .hotel-list-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--navy);
+            margin-bottom: 12px;
+        }
+
+        .hotel-filters {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 4px;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 13px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--charcoal);
+        }
+
+        .filter-btn.active {
+            background: var(--gold);
+            color: white;
+            border-color: var(--gold);
+        }
+
+        .hotel-list {
+            padding: 16px;
+        }
+
+        .hotel-card {
+            background: var(--white);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 16px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .hotel-card:active {
+            transform: scale(0.98);
+        }
+
+        .hotel-img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .hotel-info {
+            padding: 16px;
+        }
+
+        .hotel-brand {
+            font-size: 11px;
+            color: var(--gold-dark);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 4px;
+        }
+
+        .hotel-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--charcoal);
+            margin-bottom: 8px;
+        }
+
+        .hotel-addr {
+            font-size: 13px;
+            color: var(--charcoal-light);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: flex-start;
+            gap: 4px;
+        }
+
+        .hotel-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .hotel-tag {
+            font-size: 11px;
+            padding: 4px 8px;
+            background: var(--cream);
+            border-radius: 4px;
+            color: var(--charcoal-light);
+        }
+
+        .hotel-bottom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .hotel-rating {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .rating-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            background: var(--gold);
+            color: white;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .rating-count {
+            font-size: 12px;
+            color: var(--charcoal-light);
+        }
+
+        .hotel-price {
+            text-align: right;
+        }
+
+        .price-label {
+            font-size: 11px;
+            color: var(--charcoal-light);
+        }
+
+        .price-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--navy);
+        }
+
+        .price-unit {
+            font-size: 12px;
+            color: var(--charcoal-light);
+        }
+
+        /* ========== Page 4: Hotel Detail ========== */
+        .hotel-detail-page {
+            padding-bottom: 100px;
+            background: var(--cream);
+        }
+
+        .hotel-gallery {
+            height: 300px;
+            position: relative;
+        }
+
+        .hotel-gallery-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .hotel-gallery-back {
+            position: absolute;
+            top: 48px;
+            left: 16px;
+            width: 40px;
+            height: 40px;
+            background: rgba(0,0,0,0.4);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+        }
+
+        .hotel-gallery-actions {
+            position: absolute;
+            top: 48px;
+            right: 16px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .gallery-action {
+            width: 40px;
+            height: 40px;
+            background: rgba(0,0,0,0.4);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+        }
+
+        .hotel-detail-content {
+            padding: 24px 20px;
+            background: var(--white);
+            margin-top: -20px;
+            border-radius: 20px 20px 0 0;
+            position: relative;
+        }
+
+        .detail-brand {
+            font-size: 11px;
+            color: var(--gold-dark);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 6px;
+        }
+
+        .detail-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+
+        .detail-rating {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .detail-addr {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--charcoal-light);
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .detail-section {
+            padding: 20px;
+            background: var(--white);
+            margin-top: 12px;
+        }
+
+        .detail-section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--navy);
+            margin-bottom: 16px;
+        }
+
+        .facility-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .facility-item {
+            text-align: center;
+            padding: 12px 4px;
+        }
+
+        .facility-icon {
+            width: 44px;
+            height: 44px;
+            margin: 0 auto 8px;
+            background: var(--cream);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .facility-name {
+            font-size: 11px;
+            color: var(--charcoal);
+            font-weight: 500;
+        }
+
+        /* Bottom Bar */
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--white);
+            padding: 16px 20px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+            z-index: 50;
+        }
+
+        .bottom-price {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .bottom-price-label {
+            font-size: 11px;
+            color: var(--charcoal-light);
+        }
+
+        .bottom-price-row {
+            display: flex;
+            align-items: baseline;
+            gap: 2px;
+        }
+
+        .bottom-price-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--navy);
+        }
+
+        .bottom-price-unit {
+            font-size: 12px;
+            color: var(--charcoal-light);
+        }
+
+        .bottom-btn {
+            padding: 16px 32px;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(201,169,98,0.4);
+        }
+
+        /* ========== Page 5: Room List ========== */
+        .room-list-page {
+            padding: 56px 0 100px;
+            background: var(--cream);
+        }
+
+        .room-header-info {
+            padding: 16px 20px;
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .room-hotel-name {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--navy);
+            margin-bottom: 4px;
+        }
+
+        .room-date {
+            font-size: 13px;
+            color: var(--charcoal-light);
+        }
+
+        .room-list {
+            padding: 16px;
+        }
+
+        .room-card {
+            background: var(--white);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .room-card:active {
+            transform: scale(0.98);
+        }
+
+        .room-img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+        }
+
+        .room-info {
+            padding: 16px;
+        }
+
+        .room-name {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--charcoal);
+            margin-bottom: 6px;
+        }
+
+        .room-size {
+            font-size: 13px;
+            color: var(--charcoal-light);
+            margin-bottom: 10px;
+        }
+
+        .room-facilities {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .room-facility {
+            font-size: 11px;
+            padding: 4px 8px;
+            background: var(--cream);
+            border-radius: 4px;
+            color: var(--charcoal-light);
+        }
+
+        .room-card-bottom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .room-price {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .room-price-label {
+            font-size: 11px;
+            color: var(--charcoal-light);
+        }
+
+        .room-price-row {
+            display: flex;
+            align-items: baseline;
+            gap: 2px;
+        }
+
+        .room-price-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--navy);
+        }
+
+        .room-price-unit {
+            font-size: 12px;
+            color: var(--charcoal-light);
+        }
+
+        .room-book-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* ========== Page 6: Booking Confirm ========== */
+        .booking-confirm-page {
+            padding: 56px 0 100px;
+            background: var(--cream);
+        }
+
+        .booking-confirm-section {
+            background: var(--white);
+            padding: 20px;
+            margin-bottom: 12px;
+        }
+
+        .booking-confirm-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--navy);
+            margin-bottom: 16px;
+        }
+
+        .booking-confirm-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .booking-confirm-row:last-child {
+            border-bottom: none;
+        }
+
+        .booking-confirm-label {
+            font-size: 14px;
+            color: var(--charcoal-light);
+        }
+
+        .booking-confirm-value {
+            font-size: 14px;
+            color: var(--charcoal);
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            color: var(--charcoal);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 15px;
+            background: var(--cream);
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--gold);
+            background: var(--white);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .booking-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 16px;
+            border-top: 2px solid var(--border);
+        }
+
+        .booking-total-label {
+            font-size: 15px;
+            color: var(--charcoal);
+        }
+
+        .booking-total-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--navy);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(201,169,98,0.4);
+            margin-top: 24px;
+        }
+
+        /* ========== Toast ========== */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--charcoal);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 24px;
+            font-size: 14px;
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* ========== Overlay Panels ========== */
+        .overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 200;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .sort-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--white);
+            border-radius: 20px 20px 0 0;
+            padding: 24px 20px 40px;
+            z-index: 201;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .sort-panel.active {
+            transform: translateY(0);
+        }
+
+        .sort-title {
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--navy);
+        }
+
+        .sort-option {
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+
+        .sort-option:last-of-type {
+            border-bottom: none;
+        }
+
+        .sort-option-name {
+            font-size: 16px;
+            color: var(--charcoal);
+        }
+
+        .sort-option.active .sort-option-name {
+            color: var(--gold-dark);
+            font-weight: 600;
+        }
+
+        .sort-check {
+            color: var(--gold-dark);
+            font-size: 20px;
+            display: none;
+        }
+
+        .sort-option.active .sort-check {
+            display: block;
+        }
+
+        .sort-cancel {
+            margin-top: 20px;
+            width: 100%;
+            padding: 14px;
+            background: var(--cream);
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            color: var(--charcoal);
+        }
+
+        /* ========== Page 7: Membership ========== */
+        .membership-page {
+            padding: 56px 0 40px;
+            background: linear-gradient(180deg, var(--navy-deep) 0%, var(--navy) 100%);
+            min-height: 100vh;
+        }
+
+        .membership-header {
+            padding: 24px 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .membership-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .membership-subtitle {
+            font-size: 14px;
+            color: rgba(255,255,255,0.8);
+            letter-spacing: 0.1em;
+        }
+
+        .member-card-section {
+            padding: 0 16px;
+            margin-top: 24px;
+        }
+
+        .member-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 20px;
+            padding: 24px 20px;
+            margin-bottom: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .member-card:active {
+            transform: scale(0.98);
+        }
+
+        .member-card-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .member-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .member-icon.jade {
+            background: linear-gradient(135deg, #1D6A5F 0%, #2A8F7F 100%);
+        }
+
+        .member-icon.diamond {
+            background: linear-gradient(135deg, #4A90A4 0%, #7EC8E3 100%);
+        }
+
+        .member-icon.gold {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+        }
+
+        .member-info {
+            flex: 1;
+        }
+
+        .member-level {
+            font-size: 20px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 4px;
+        }
+
+        .member-desc {
+            font-size: 13px;
+            color: rgba(255,255,255,0.7);
+            line-height: 1.5;
+        }
+
+        .member-benefits {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .member-benefit {
+            font-size: 12px;
+            padding: 6px 12px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 16px;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .member-points-section {
+            margin: 24px 16px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 20px;
+        }
+
+        .member-points-title {
+            font-size: 14px;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 8px;
+        }
+
+        .member-points-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--gold-light);
+        }
+
+        .member-points-label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+        }
+
+        /* ========== Page 8: Offers ========== */
+        .offers-page {
+            padding: 56px 0 40px;
+            background: var(--cream);
+        }
+
+        .offers-header {
+            padding: 20px;
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .offers-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 4px;
+        }
+
+        .offers-subtitle {
+            font-size: 14px;
+            color: var(--charcoal-light);
+        }
+
+        .offers-tabs {
+            display: flex;
+            gap: 8px;
+            padding: 16px 20px;
+            background: var(--white);
+            overflow-x: auto;
+        }
+
+        .offers-tab {
+            padding: 8px 16px;
+            background: var(--cream);
+            border: none;
+            border-radius: 20px;
+            font-size: 14px;
+            white-space: nowrap;
+            cursor: pointer;
+            color: var(--charcoal);
+            transition: all 0.2s;
+        }
+
+        .offers-tab.active {
+            background: var(--navy);
+            color: white;
+        }
+
+        .offers-list {
+            padding: 16px;
+        }
+
+        .offer-card {
+            background: var(--white);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .offer-card:active {
+            transform: scale(0.98);
+        }
+
+        .offer-img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+        }
+
+        .offer-content {
+            padding: 16px;
+        }
+
+        .offer-tag {
+            display: inline-block;
+            font-size: 11px;
+            padding: 4px 8px;
+            background: var(--gold-light);
+            color: var(--gold-dark);
+            border-radius: 4px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .offer-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--charcoal);
+            margin-bottom: 8px;
+        }
+
+        .offer-desc {
+            font-size: 13px;
+            color: var(--charcoal-light);
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .offer-price {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--navy);
+        }
+
+        .offer-price span {
+            font-size: 13px;
+            font-weight: 400;
+            color: var(--charcoal-light);
+        }
+
+        .offer-validity {
+            font-size: 12px;
+            color: var(--charcoal-light);
+            margin-top: 8px;
+        }
+
+        /* ========== Page 9: Dining ========== */
+        .dining-page {
+            padding: 56px 0 40px;
+            background: var(--cream);
+        }
+
+        .dining-header {
+            padding: 20px;
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .dining-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 4px;
+        }
+
+        .dining-subtitle {
+            font-size: 14px;
+            color: var(--charcoal-light);
+        }
+
+        .dining-list {
+            padding: 16px;
+        }
+
+        .dining-card {
+            background: var(--white);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .dining-card:active {
+            transform: scale(0.98);
+        }
+
+        .dining-img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .dining-content {
+            padding: 16px;
+        }
+
+        .dining-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--charcoal);
+            margin-bottom: 4px;
+        }
+
+        .dining-hotel {
+            font-size: 13px;
+            color: var(--gold-dark);
+            margin-bottom: 8px;
+        }
+
+        .dining-cuisine {
+            font-size: 13px;
+            color: var(--charcoal-light);
+            margin-bottom: 12px;
+        }
+
+        .dining-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .dining-time {
+            font-size: 13px;
+            color: var(--charcoal-light);
+        }
+
+        .dining-book-btn {
+            padding: 10px 20px;
+            background: var(--navy);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        /* ========== Bottom Navigation ========== */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--white);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0 28px;
+            border-top: 1px solid var(--border);
+            z-index: 90;
+        }
+
+        .bottom-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            color: var(--charcoal-light);
+            transition: color 0.2s;
+        }
+
+        .bottom-nav-item.active {
+            color: var(--gold-dark);
+        }
+
+        .bottom-nav-item svg {
+            width: 24px;
+            height: 24px;
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
+        }
+
+        .bottom-nav-item span {
+            font-size: 11px;
+        }
+
+        /* Page with bottom nav needs padding */
+        .with-bottom-nav {
+            padding-bottom: 80px;
+        }
+    </style>
+</head>
+<body>
+    <!-- ========== Page 1: Home ========== -->
+    <div class="page active" id="page-home">
+        <nav class="nav transparent">
+            <div class="nav-icon"></div>
+            <div class="nav-center">
+                <div class="logo-icon">香</div>
+                <span class="logo-text">SHANGRI-LA</span>
+            </div>
+            <div class="nav-icon">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/></svg>
+            </div>
+        </nav>
+
+        <div class="home-hero">
+            <div class="home-hero-bg"></div>
+            <h1 class="home-title">探索世界</h1>
+            <p class="home-subtitle">Discover The World</p>
+        </div>
+
+        <div class="booking-widget">
+            <div class="booking-widget-title">预订您的完美旅程</div>
+            <div class="booking-row">
+                <div class="booking-field" onclick="showPage('page-dest')">
+                    <label>目的地</label>
+                    <div class="value" id="selected-dest">选择城市</div>
+                </div>
+            </div>
+            <div class="booking-row">
+                <div class="booking-field">
+                    <label>入住</label>
+                    <div class="value">3月15日 周六</div>
+                </div>
+                <div class="booking-field">
+                    <label>退房</label>
+                    <div class="value">3月16日 周日</div>
+                </div>
+            </div>
+            <div class="booking-row">
+                <div class="booking-field">
+                    <label>房间</label>
+                    <div class="value">1间</div>
+                </div>
+                <div class="booking-field">
+                    <label>成人</label>
+                    <div class="value">2位</div>
+                </div>
+            </div>
+            <button class="booking-btn" onclick="searchHotels()">搜索酒店</button>
+        </div>
+    </div>
+
+    <!-- ========== Page 2: Destination Select ========== -->
+    <div class="page" id="page-dest">
+        <div class="dest-page">
+            <nav class="nav white">
+                <div class="nav-icon" onclick="showPage('page-home')">
+                    <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+                </div>
+                <span class="nav-title">选择目的地</span>
+                <div class="nav-icon"></div>
+            </nav>
+
+            <div class="dest-search">
+                <input type="text" class="search-input" placeholder="搜索城市或酒店" id="dest-search-input">
+            </div>
+
+            <div class="dest-tabs">
+                <button class="dest-tab active" onclick="filterDest('china')">中国大陆</button>
+                <button class="dest-tab" onclick="filterDest('asia')">亚太地区</button>
+                <button class="dest-tab" onclick="filterDest('europe')">中东·欧洲</button>
+                <button class="dest-tab" onclick="filterDest('america')">北美</button>
+            </div>
+
+            <div class="dest-list" id="dest-list">
+                <div class="dest-group-title">热门目的地</div>
+                <div class="dest-item" onclick="selectDest('北京', 3)">
+                    <div class="dest-item-info">
+                        <div class="dest-item-name">北京</div>
+                        <div class="dest-item-count">3 家酒店</div>
+                    </div>
+                    <span class="dest-item-arrow">›</span>
+                </div>
+                <div class="dest-item" onclick="selectDest('上海', 4)">
+                    <div class="dest-item-info">
+                        <div class="dest-item-name">上海</div>
+                        <div class="dest-item-count">4 家酒店</div>
+                    </div>
+                    <span class="dest-item-arrow">›</span>
+                </div>
+                <div class="dest-item" onclick="selectDest('香港', 5)">
+                    <div class="dest-item-info">
+                        <div class="dest-item-name">香港</div>
+                        <div class="dest-item-count">5 家酒店</div>
+                    </div>
+                    <span class="dest-item-arrow">›</span>
+                </div>
+                <div class="dest-item" onclick="selectDest('新加坡', 2)">
+                    <div class="dest-item-info">
+                        <div class="dest-item-name">新加坡</div>
+                        <div class="dest-item-count">2 家酒店</div>
+                    </div>
+                    <span class="dest-item-arrow">›</span>
+                </div>
+                <div class="dest-group-title">亚太地区</div>
+                <div class="dest-item" onclick="selectDest('东京', 1)">
+                    <div class="dest-item-info">
+                        <div class="dest-item-name">东京</div>
+                        <div class="dest-item-count">1 家酒店</div>
+                    </div>
+                    <span class="dest-item-arrow">›</span>
+                </div>
+                <div class="dest-item" onclick="selectDest('曼谷', 2)">
+                    <div class="dest-item-info">
+                        <div class="dest-item-name">曼谷</div>
+                        <div class="dest-item-count">2 家酒店</div>
+                    </div>
+                    <span class="dest-item-arrow">›</span>
+                </div>
+                <div class="dest-item" onclick="selectDest('悉尼', 1)">
+                    <div class="dest-item-info">
+                        <div class="dest-item-name">悉尼</div>
+                        <div class="dest-item-count">1 家酒店</div>
+                    </div>
+                    <span class="dest-item-arrow">›</span>
+                </div>
+                <div class="dest-item" onclick="selectDest('吉隆坡', 2)">
+                    <div class="dest-item-info">
+                        <div class="dest-item-name">吉隆坡</div>
+                        <div class="dest-item-count">2 家酒店</div>
+                    </div>
+                    <span class="dest-item-arrow">›</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== Page 3: Hotel List ========== -->
+    <div class="page" id="page-hotel-list">
+        <div class="hotel-list-page">
+            <nav class="nav white">
+                <div class="nav-icon" onclick="showPage('page-home')">
+                    <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+                </div>
+                <div class="nav-center">
+                    <div class="logo-icon">香</div>
+                    <span class="logo-text">SHANGRI-LA</span>
+                </div>
+                <div class="nav-icon">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/></svg>
+                </div>
+            </nav>
+
+            <div class="hotel-list-header" style="position:sticky;top:56px">
+                <div class="hotel-list-title" id="hotel-list-title">北京的酒店</div>
+                <div class="hotel-filters">
+                    <button class="filter-btn active" onclick="filterHotels('all', this)">全部</button>
+                    <button class="filter-btn" onclick="showSortPanel()">价格排序</button>
+                    <button class="filter-btn" onclick="filterHotels('rating', this)">评分最高</button>
+                    <button class="filter-btn" onclick="filterHotels('shangri-la', this)">香格里拉</button>
+                    <button class="filter-btn" onclick="filterHotels('kerry', this)">嘉里酒店</button>
+                </div>
+            </div>
+
+            <div class="hotel-list" id="hotel-list">
+                <!-- Hotel cards will be rendered here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== Page 4: Hotel Detail ========== -->
+    <div class="page" id="page-hotel-detail">
+        <div class="hotel-detail-page">
+            <div class="hotel-gallery">
+                <img class="hotel-gallery-img" id="detail-img" src="" alt="Hotel">
+                <div class="hotel-gallery-back" onclick="showPage('page-hotel-list')">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+                </div>
+                <div class="hotel-gallery-actions">
+                    <div class="gallery-action" onclick="toggleFavorite(this)">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                    </div>
+                    <div class="gallery-action">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hotel-detail-content">
+                <div class="detail-brand" id="detail-brand">香格里拉酒店</div>
+                <h1 class="detail-name" id="detail-name">酒店名称</h1>
+                <div class="detail-rating">
+                    <span class="rating-badge">★ <span id="detail-rating">4.8</span></span>
+                    <span class="rating-count" id="detail-rating-count">2,156条评价</span>
+                </div>
+                <div class="detail-addr">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    <span id="detail-addr">酒店地址</span>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <h3 class="detail-section-title">酒店设施</h3>
+                <div class="facility-grid">
+                    <div class="facility-item">
+                        <div class="facility-icon">📶</div>
+                        <div class="facility-name">免费WiFi</div>
+                    </div>
+                    <div class="facility-item">
+                        <div class="facility-icon">🏊</div>
+                        <div class="facility-name">游泳池</div>
+                    </div>
+                    <div class="facility-item">
+                        <div class="facility-icon">💪</div>
+                        <div class="facility-name">健身房</div>
+                    </div>
+                    <div class="facility-item">
+                        <div class="facility-icon">🅿️</div>
+                        <div class="facility-name">停车场</div>
+                    </div>
+                    <div class="facility-item">
+                        <div class="facility-icon">🍽️</div>
+                        <div class="facility-name">餐厅</div>
+                    </div>
+                    <div class="facility-item">
+                        <div class="facility-icon">🧖</div>
+                        <div class="facility-name">SPA</div>
+                    </div>
+                    <div class="facility-item">
+                        <div class="facility-icon">☕</div>
+                        <div class="facility-name">行政酒廊</div>
+                    </div>
+                    <div class="facility-item">
+                        <div class="facility-icon">👶</div>
+                        <div class="facility-name">儿童设施</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bottom-bar">
+                <div class="bottom-price">
+                    <span class="bottom-price-label">每晚最低</span>
+                    <div class="bottom-price-row">
+                        <span class="bottom-price-value" id="detail-price">¥1,288</span>
+                        <span class="bottom-price-unit">起</span>
+                    </div>
+                </div>
+                <button class="bottom-btn" onclick="showPage('page-room-list')">选择房型</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== Page 5: Room List ========== -->
+    <div class="page" id="page-room-list">
+        <div class="room-list-page">
+            <nav class="nav white">
+                <div class="nav-icon" onclick="showPage('page-hotel-detail')">
+                    <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+                </div>
+                <span class="nav-title">选择房型</span>
+                <div class="nav-icon"></div>
+            </nav>
+
+            <div class="room-header-info">
+                <div class="room-hotel-name" id="room-hotel-name">北京香格里拉大酒店</div>
+                <div class="room-date">3月15日 - 3月16日 · 1晚 · 1间房 · 2位成人</div>
+            </div>
+
+            <div class="room-list" id="room-list">
+                <!-- Room cards will be rendered here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== Page 6: Booking Confirm ========== -->
+    <div class="page" id="page-booking-confirm">
+        <div class="booking-confirm-page">
+            <nav class="nav white">
+                <div class="nav-icon" onclick="showPage('page-room-list')">
+                    <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+                </div>
+                <span class="nav-title">确认预订</span>
+                <div class="nav-icon"></div>
+            </nav>
+
+            <div class="booking-confirm-section">
+                <div class="booking-confirm-title">预订信息</div>
+                <div class="booking-confirm-row">
+                    <span class="booking-confirm-label">酒店</span>
+                    <span class="booking-confirm-value" id="confirm-hotel">北京香格里拉大酒店</span>
+                </div>
+                <div class="booking-confirm-row">
+                    <span class="booking-confirm-label">房型</span>
+                    <span class="booking-confirm-value" id="confirm-room">豪华客房</span>
+                </div>
+                <div class="booking-confirm-row">
+                    <span class="booking-confirm-label">入住日期</span>
+                    <span class="booking-confirm-value">2024年3月15日 - 3月16日</span>
+                </div>
+                <div class="booking-confirm-row">
+                    <span class="booking-confirm-label">房间数量</span>
+                    <span class="booking-confirm-value">1间</span>
+                </div>
+            </div>
+
+            <div class="booking-confirm-section">
+                <div class="booking-confirm-title">入住人信息</div>
+                <div class="form-group">
+                    <label class="form-label">姓名 *</label>
+                    <input type="text" class="form-input" placeholder="请输入入住人姓名">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">手机号 *</label>
+                        <input type="tel" class="form-input" placeholder="请输入手机号">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">邮箱</label>
+                        <input type="email" class="form-input" placeholder="选填">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">特殊要求</label>
+                    <input type="text" class="form-input" placeholder="如：高楼层、无烟房等">
+                </div>
+            </div>
+
+            <div class="booking-confirm-section">
+                <div class="booking-confirm-title">价格明细</div>
+                <div class="booking-confirm-row">
+                    <span class="booking-confirm-label">房费 (1晚)</span>
+                    <span class="booking-confirm-value" id="confirm-price">¥1,288</span>
+                </div>
+                <div class="booking-confirm-row">
+                    <span class="booking-confirm-label">服务费</span>
+                    <span class="booking-confirm-value">¥0</span>
+                </div>
+                <div class="booking-total">
+                    <span class="booking-total-label">应付总额</span>
+                    <span class="booking-total-value" id="confirm-total">¥1,288</span>
+                </div>
+                <button class="submit-btn" onclick="submitBooking()">确认预订</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== Page 7: Membership ========== -->
+    <div class="page" id="page-membership">
+        <div class="membership-page">
+            <nav class="nav" style="background: transparent;">
+                <div class="nav-icon" onclick="showPage('page-home')">
+                    <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+                </div>
+                <span class="nav-title" style="color: white;">会员中心</span>
+                <div class="nav-icon" style="color: white;">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/></svg>
+                </div>
+            </nav>
+
+            <div class="membership-header">
+                <h1 class="membership-title">香格里拉金环会</h1>
+                <p class="membership-subtitle">GOLDEN CIRCLE REWARDS</p>
+            </div>
+
+            <div class="member-points-section">
+                <div class="member-points-title">我的积分</div>
+                <div class="member-points-value">12,580</div>
+                <div class="member-points-label">可兑换 ¥1,258 住宿抵用金</div>
+            </div>
+
+            <div class="member-card-section">
+                <div class="member-card" onclick="showMemberDetail('jade')">
+                    <div class="member-card-header">
+                        <div class="member-icon jade">🫧</div>
+                        <div class="member-info">
+                            <div class="member-level">翡翠会员</div>
+                            <div class="member-desc">开启您的会员之旅，享受专属礼遇与积分累积</div>
+                        </div>
+                    </div>
+                    <div class="member-benefits">
+                        <span class="member-benefit">积分累积</span>
+                        <span class="member-benefit">会员房价</span>
+                        <span class="member-benefit">延迟退房</span>
+                    </div>
+                </div>
+
+                <div class="member-card" onclick="showMemberDetail('diamond')">
+                    <div class="member-card-header">
+                        <div class="member-icon diamond">💎</div>
+                        <div class="member-info">
+                            <div class="member-level">钻石会员</div>
+                            <div class="member-desc">尊享更多专属礼遇，体验非凡旅程</div>
+                        </div>
+                    </div>
+                    <div class="member-benefits">
+                        <span class="member-benefit">双倍积分</span>
+                        <span class="member-benefit">行政酒廊</span>
+                        <span class="member-benefit">免费早餐</span>
+                        <span class="member-benefit">房型升级</span>
+                    </div>
+                </div>
+
+                <div class="member-card" onclick="showMemberDetail('gold')">
+                    <div class="member-card-header">
+                        <div class="member-icon gold">👑</div>
+                        <div class="member-info">
+                            <div class="member-level">黑金会员</div>
+                            <div class="member-desc">最高等级礼遇，尽享无上尊贵体验</div>
+                        </div>
+                    </div>
+                    <div class="member-benefits">
+                        <span class="member-benefit">三倍积分</span>
+                        <span class="member-benefit">专车接送</span>
+                        <span class="member-benefit">私人管家</span>
+                        <span class="member-benefit">套房升级</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== Page 8: Offers ========== -->
+    <div class="page" id="page-offers">
+        <div class="offers-page">
+            <nav class="nav white">
+                <div class="nav-icon" onclick="showPage('page-home')">
+                    <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+                </div>
+                <span class="nav-title">优惠活动</span>
+                <div class="nav-icon"></div>
+            </nav>
+
+            <div class="offers-header">
+                <h1 class="offers-title">精选优惠</h1>
+                <p class="offers-subtitle">专属礼遇，限时优惠</p>
+            </div>
+
+            <div class="offers-tabs">
+                <button class="offers-tab active" onclick="filterOffers('all')">全部优惠</button>
+                <button class="offers-tab" onclick="filterOffers('hotel')">住宿优惠</button>
+                <button class="offers-tab" onclick="filterOffers('dining')">餐饮优惠</button>
+                <button class="offers-tab" onclick="filterOffers('spa')">水疗优惠</button>
+            </div>
+
+            <div class="offers-list" id="offers-list">
+                <div class="offer-card" onclick="showOfferDetail(1)">
+                    <img class="offer-img" src="https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=600&h=300&fit=crop" alt="春日特惠">
+                    <div class="offer-content">
+                        <span class="offer-tag">限时优惠</span>
+                        <h3 class="offer-title">春日焕新之旅</h3>
+                        <p class="offer-desc">预订春季入住，享双人早餐及延迟退房至下午4点</p>
+                        <div class="offer-price">¥1,288 <span>/ 每晚起</span></div>
+                        <div class="offer-validity">有效期: 2024.03.01 - 2024.05.31</div>
+                    </div>
+                </div>
+
+                <div class="offer-card" onclick="showOfferDetail(2)">
+                    <img class="offer-img" src="https://images.unsplash.com/photo-1584132967334-10e028bd69f7?w=600&h=300&fit=crop" alt="会员专享">
+                    <div class="offer-content">
+                        <span class="offer-tag">会员专享</span>
+                        <h3 class="offer-title">会员尊享房价</h3>
+                        <p class="offer-desc">金环会会员预订享最优房价保证，额外积分奖励</p>
+                        <div class="offer-price">¥988 <span>/ 每晚起</span></div>
+                        <div class="offer-validity">长期有效</div>
+                    </div>
+                </div>
+
+                <div class="offer-card" onclick="showOfferDetail(3)">
+                    <img class="offer-img" src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600&h=300&fit=crop" alt="水疗特惠">
+                    <div class="offer-content">
+                        <span class="offer-tag">水疗优惠</span>
+                        <h3 class="offer-title">SPA焕活之旅</h3>
+                        <p class="offer-desc">预订90分钟SPA护理，赠送30分钟头部按摩</p>
+                        <div class="offer-price">¥688 <span>/ 人起</span></div>
+                        <div class="offer-validity">有效期: 2024.03.01 - 2024.04.30</div>
+                    </div>
+                </div>
+
+                <div class="offer-card" onclick="showOfferDetail(4)">
+                    <img class="offer-img" src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&h=300&fit=crop" alt="美食之旅">
+                    <div class="offer-content">
+                        <span class="offer-tag">餐饮优惠</span>
+                        <h3 class="offer-title">米其林美食之旅</h3>
+                        <p class="offer-desc">预订米其林餐厅晚餐，享专属品鉴菜单及葡萄酒搭配</p>
+                        <div class="offer-price">¥1,588 <span>/ 人起</span></div>
+                        <div class="offer-validity">有效期: 2024.03.15 - 2024.06.30</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== Page 9: Dining ========== -->
+    <div class="page" id="page-dining">
+        <div class="dining-page">
+            <nav class="nav white">
+                <div class="nav-icon" onclick="showPage('page-home')">
+                    <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+                </div>
+                <span class="nav-title">餐厅预订</span>
+                <div class="nav-icon"></div>
+            </nav>
+
+            <div class="dining-header">
+                <h1 class="dining-title">精选餐厅</h1>
+                <p class="dining-subtitle">探索世界各地的美食体验</p>
+            </div>
+
+            <div class="dining-list" id="dining-list">
+                <div class="dining-card" onclick="showDiningDetail(1)">
+                    <img class="dining-img" src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&h=300&fit=crop" alt="夏宫">
+                    <div class="dining-content">
+                        <h3 class="dining-name">夏宫</h3>
+                        <p class="dining-hotel">北京香格里拉大酒店</p>
+                        <p class="dining-cuisine">粤菜 · 川菜 · 米其林一星</p>
+                        <div class="dining-info">
+                            <span class="dining-time">午餐 11:30-14:30 · 晚餐 17:30-22:00</span>
+                            <button class="dining-book-btn">预订</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dining-card" onclick="showDiningDetail(2)">
+                    <img class="dining-img" src="https://images.unsplash.com/photo-1559339352-11d035aa65de?w=600&h=300&fit=crop" alt="AZUR">
+                    <div class="dining-content">
+                        <h3 class="dining-name">AZUR 蔚蓝</h3>
+                        <p class="dining-hotel">上海浦东香格里拉大酒店</p>
+                        <p class="dining-cuisine">法式料理 · 米其林推荐</p>
+                        <div class="dining-info">
+                            <span class="dining-time">晚餐 18:00-22:00</span>
+                            <button class="dining-book-btn">预订</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dining-card" onclick="showDiningDetail(3)">
+                    <img class="dining-img" src="https://images.unsplash.com/photo-1579027989536-b7b1f875659b?w=600&h=300&fit=crop" alt="滩万">
+                    <div class="dining-content">
+                        <h3 class="dining-name">滩万</h3>
+                        <p class="dining-hotel">香港香格里拉大酒店</p>
+                        <p class="dining-cuisine">日式料理 · 寿司 · 怀石料理</p>
+                        <div class="dining-info">
+                            <span class="dining-time">午餐 12:00-14:00 · 晚餐 18:00-22:00</span>
+                            <button class="dining-book-btn">预订</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sort Panel -->
+    <div class="overlay" id="overlay" onclick="hideSortPanel()"></div>
+    <div class="sort-panel" id="sortPanel">
+        <div class="sort-title">排序方式</div>
+        <div class="sort-option active" onclick="selectSort(this, 'recommend')">
+            <span class="sort-option-name">推荐排序</span>
+            <span class="sort-check">✓</span>
+        </div>
+        <div class="sort-option" onclick="selectSort(this, 'price-asc')">
+            <span class="sort-option-name">价格从低到高</span>
+            <span class="sort-check">✓</span>
+        </div>
+        <div class="sort-option" onclick="selectSort(this, 'price-desc')">
+            <span class="sort-option-name">价格从高到低</span>
+            <span class="sort-check">✓</span>
+        </div>
+        <div class="sort-option" onclick="selectSort(this, 'rating')">
+            <span class="sort-option-name">评分从高到低</span>
+            <span class="sort-check">✓</span>
+        </div>
+        <button class="sort-cancel" onclick="hideSortPanel()">取消</button>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav" id="bottom-nav">
+        <div class="bottom-nav-item active" onclick="navigateTo('page-home', this)">
+            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>首页</span>
+        </div>
+        <div class="bottom-nav-item" onclick="navigateTo('page-offers', this)">
+            <svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+            <span>优惠</span>
+        </div>
+        <div class="bottom-nav-item" onclick="navigateTo('page-membership', this)">
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <span>会员</span>
+        </div>
+        <div class="bottom-nav-item" onclick="navigateTo('page-dining', this)">
+            <svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+            <span>餐饮</span>
+        </div>
+        <div class="bottom-nav-item" onclick="showAccount()">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/></svg>
+            <span>我的</span>
+        </div>
+    </div>
+
+    <script>
+        // ========== Data ==========
+        const hotels = {
+            '北京': [
+                { id: 1, name: '北京香格里拉大酒店', brand: '香格里拉酒店', addr: '海淀区紫竹院路29号', rating: 4.8, reviews: 2156, price: 1288, img: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&h=400&fit=crop', tags: ['免费WiFi', '游泳池', '健身房'] },
+                { id: 2, name: '北京国贸大酒店', brand: '香格里拉酒店', addr: '朝阳区建国门外大街1号', rating: 4.9, reviews: 1892, price: 1588, img: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=600&h=400&fit=crop', tags: ['免费WiFi', '行政酒廊'] },
+                { id: 3, name: '北京嘉里大酒店', brand: '嘉里酒店', addr: '朝阳区光华路1号', rating: 4.7, reviews: 1234, price: 1088, img: 'https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=600&h=400&fit=crop', tags: ['免费WiFi', '儿童乐园'] }
+            ],
+            '上海': [
+                { id: 4, name: '上海浦东香格里拉大酒店', brand: '香格里拉酒店', addr: '浦东新区富城路33号', rating: 4.9, reviews: 3245, price: 1688, img: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=600&h=400&fit=crop', tags: ['免费WiFi', '江景房', '游泳池'] },
+                { id: 5, name: '上海静安香格里拉大酒店', brand: '香格里拉酒店', addr: '静安区延安中路1218号', rating: 4.8, reviews: 2567, price: 1388, img: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=600&h=400&fit=crop', tags: ['免费WiFi', '行政酒廊'] },
+                { id: 6, name: '上海虹桥康得思酒店', brand: '嘉里酒店', addr: '闵行区虹桥商务区', rating: 4.7, reviews: 1567, price: 1188, img: 'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=600&h=400&fit=crop', tags: ['免费WiFi', 'SPA'] }
+            ],
+            '香港': [
+                { id: 7, name: '香港香格里拉大酒店', brand: '香格里拉酒店', addr: '金钟太古广场', rating: 4.9, reviews: 4567, price: 2288, img: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=600&h=400&fit=crop', tags: ['免费WiFi', '游泳池', '海景'] },
+                { id: 8, name: '香港港岛香格里拉大酒店', brand: '香格里拉酒店', addr: '中环金融街', rating: 4.8, reviews: 3456, price: 1988, img: 'https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=600&h=400&fit=crop', tags: ['免费WiFi', '行政酒廊'] }
+            ],
+            '新加坡': [
+                { id: 9, name: '新加坡香格里拉大酒店', brand: '香格里拉酒店', addr: '乌节路22号', rating: 4.9, reviews: 5678, price: 2588, img: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=600&h=400&fit=crop', tags: ['免费WiFi', '游泳池', '花园'] }
+            ]
+        };
+
+        const rooms = [
+            { name: '豪华客房', size: '45㎡', bed: '大床', guests: 2, price: 1288, img: 'https://images.unsplash.com/photo-1590490360182-c33d57733427?w=400&h=300&fit=crop', facilities: ['免费WiFi', '早餐'] },
+            { name: '行政客房', size: '52㎡', bed: '大床', guests: 2, price: 1688, img: 'https://images.unsplash.com/photo-1591088398332-8a7791972843?w=400&h=300&fit=crop', facilities: ['免费WiFi', '早餐', '酒廊'] },
+            { name: '豪华套房', size: '85㎡', bed: '大床', guests: 3, price: 2888, img: 'https://images.unsplash.com/photo-1590490360182-c33d57733427?w=400&h=300&fit=crop', facilities: ['免费WiFi', '早餐', '客厅'] },
+            { name: '总统套房', size: '150㎡', bed: '大床', guests: 4, price: 8888, img: 'https://images.unsplash.com/photo-1591088398332-8a7791972843?w=400&h=300&fit=crop', facilities: ['免费WiFi', '早餐', '管家服务'] }
+        ];
+
+        // ========== State ==========
+        let currentDest = '';
+        let currentHotel = null;
+        let currentRoom = null;
+        let currentSort = 'recommend';
+
+        // ========== Navigation ==========
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        // ========== Destination Selection ==========
+        function selectDest(name, count) {
+            currentDest = name;
+            document.getElementById('selected-dest').textContent = name;
+            showPage('page-home');
+            showToast(`已选择: ${name}`);
+        }
+
+        function filterDest(region) {
+            document.querySelectorAll('.dest-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        // ========== Hotel List ==========
+        function searchHotels() {
+            if (!currentDest) {
+                showToast('请先选择目的地');
+                return;
+            }
+            renderHotelList();
+            showPage('page-hotel-list');
+        }
+
+        function renderHotelList() {
+            const list = document.getElementById('hotel-list');
+            const title = document.getElementById('hotel-list-title');
+            const hotelData = hotels[currentDest] || hotels['北京'];
+
+            title.textContent = `${currentDest || '北京'}的酒店`;
+
+            let sortedData = [...hotelData];
+            if (currentSort === 'price-asc') {
+                sortedData.sort((a, b) => a.price - b.price);
+            } else if (currentSort === 'price-desc') {
+                sortedData.sort((a, b) => b.price - a.price);
+            } else if (currentSort === 'rating') {
+                sortedData.sort((a, b) => b.rating - a.rating);
+            }
+
+            list.innerHTML = sortedData.map(hotel => `
+                <div class="hotel-card" onclick="showHotelDetail(${hotel.id})">
+                    <img class="hotel-img" src="${hotel.img}" alt="${hotel.name}">
+                    <div class="hotel-info">
+                        <div class="hotel-brand">${hotel.brand}</div>
+                        <div class="hotel-name">${hotel.name}</div>
+                        <div class="hotel-addr">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                            ${hotel.addr}
+                        </div>
+                        <div class="hotel-tags">
+                            ${hotel.tags.map(t => `<span class="hotel-tag">${t}</span>`).join('')}
+                        </div>
+                        <div class="hotel-bottom">
+                            <div class="hotel-rating">
+                                <span class="rating-badge">★ ${hotel.rating}</span>
+                                <span class="rating-count">${hotel.reviews.toLocaleString()}条评价</span>
+                            </div>
+                            <div class="hotel-price">
+                                <div class="price-label">每晚最低</div>
+                                <span class="price-value">¥${hotel.price.toLocaleString()}</span>
+                                <span class="price-unit">起</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterHotels(type, btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            renderHotelList();
+        }
+
+        // ========== Hotel Detail ==========
+        function showHotelDetail(id) {
+            const hotelData = hotels[currentDest] || hotels['北京'];
+            currentHotel = hotelData.find(h => h.id === id) || hotelData[0];
+
+            document.getElementById('detail-img').src = currentHotel.img;
+            document.getElementById('detail-brand').textContent = currentHotel.brand;
+            document.getElementById('detail-name').textContent = currentHotel.name;
+            document.getElementById('detail-rating').textContent = currentHotel.rating;
+            document.getElementById('detail-rating-count').textContent = currentHotel.reviews.toLocaleString() + '条评价';
+            document.getElementById('detail-addr').textContent = currentHotel.addr;
+            document.getElementById('detail-price').textContent = '¥' + currentHotel.price.toLocaleString();
+
+            showPage('page-hotel-detail');
+        }
+
+        function toggleFavorite(el) {
+            el.classList.toggle('favorited');
+            const svg = el.querySelector('svg');
+            if (el.classList.contains('favorited')) {
+                svg.setAttribute('fill', 'currentColor');
+                showToast('已添加到收藏');
+            } else {
+                svg.setAttribute('fill', 'none');
+                showToast('已取消收藏');
+            }
+        }
+
+        // ========== Room List ==========
+        function renderRoomList() {
+            const list = document.getElementById('room-list');
+            document.getElementById('room-hotel-name').textContent = currentHotel ? currentHotel.name : '北京香格里拉大酒店';
+
+            list.innerHTML = rooms.map(room => `
+                <div class="room-card">
+                    <img class="room-img" src="${room.img}" alt="${room.name}">
+                    <div class="room-info">
+                        <div class="room-name">${room.name}</div>
+                        <div class="room-size">${room.size} · ${room.bed} · 可住${room.guests}人</div>
+                        <div class="room-facilities">
+                            ${room.facilities.map(f => `<span class="room-facility">${f}</span>`).join('')}
+                        </div>
+                        <div class="room-card-bottom">
+                            <div class="room-price">
+                                <span class="room-price-label">每晚</span>
+                                <div class="room-price-row">
+                                    <span class="room-price-value">¥${room.price.toLocaleString()}</span>
+                                </div>
+                            </div>
+                            <button class="room-book-btn" onclick="selectRoom('${room.name}', ${room.price})">预订</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Override the showPage to render room list when showing that page
+        const originalShowPage = showPage;
+        showPage = function(pageId) {
+            originalShowPage(pageId);
+            if (pageId === 'page-room-list') {
+                renderRoomList();
+            }
+        };
+
+        function selectRoom(name, price) {
+            currentRoom = { name, price };
+            document.getElementById('confirm-hotel').textContent = currentHotel ? currentHotel.name : '北京香格里拉大酒店';
+            document.getElementById('confirm-room').textContent = name;
+            document.getElementById('confirm-price').textContent = '¥' + price.toLocaleString();
+            document.getElementById('confirm-total').textContent = '¥' + price.toLocaleString();
+            showPage('page-booking-confirm');
+        }
+
+        // ========== Booking ==========
+        function submitBooking() {
+            showToast('预订成功！确认邮件已发送至您的邮箱');
+            setTimeout(() => {
+                showPage('page-home');
+            }, 2000);
+        }
+
+        // ========== Sort Panel ==========
+        function showSortPanel() {
+            document.getElementById('overlay').classList.add('active');
+            document.getElementById('sortPanel').classList.add('active');
+        }
+
+        function hideSortPanel() {
+            document.getElementById('overlay').classList.remove('active');
+            document.getElementById('sortPanel').classList.remove('active');
+        }
+
+        function selectSort(el, sortType) {
+            document.querySelectorAll('.sort-option').forEach(o => o.classList.remove('active'));
+            el.classList.add('active');
+            currentSort = sortType;
+            setTimeout(() => {
+                hideSortPanel();
+                renderHotelList();
+            }, 200);
+        }
+
+        // ========== Toast ==========
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        // ========== Nav Scroll Effect ==========
+        window.addEventListener('scroll', function() {
+            const nav = document.querySelector('#page-home .nav');
+            if (nav && document.getElementById('page-home').classList.contains('active')) {
+                if (window.scrollY > 100) {
+                    nav.classList.remove('transparent');
+                    nav.classList.add('white');
+                } else {
+                    nav.classList.remove('white');
+                    nav.classList.add('transparent');
+                }
+            }
+        });
+
+        // ========== Bottom Navigation ==========
+        function navigateTo(pageId, el) {
+            document.querySelectorAll('.bottom-nav-item').forEach(item => item.classList.remove('active'));
+            if (el) el.classList.add('active');
+            showPage(pageId);
+        }
+
+        function showAccount() {
+            showToast('请先登录您的账户');
+        }
+
+        // ========== Membership ==========
+        function showMemberDetail(level) {
+            const levelNames = {
+                'jade': '翡翠会员',
+                'diamond': '钻石会员',
+                'gold': '黑金会员'
+            };
+            showToast(`查看${levelNames[level]}详情`);
+        }
+
+        // ========== Offers ==========
+        function filterOffers(type) {
+            document.querySelectorAll('.offers-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function showOfferDetail(id) {
+            showToast('查看优惠详情');
+        }
+
+        // ========== Dining ==========
+        function showDiningDetail(id) {
+            showToast('查看餐厅详情');
+        }
+
+        // ========== Hide booking widget on certain pages ==========
+        const originalShowPage2 = showPage;
+        showPage = function(pageId) {
+            originalShowPage2(pageId);
+
+            // Hide booking widget on non-home pages
+            const bookingWidget = document.querySelector('.booking-widget');
+            const bottomNav = document.getElementById('bottom-nav');
+
+            if (pageId === 'page-home') {
+                if (bookingWidget) bookingWidget.style.display = 'block';
+                if (bottomNav) bottomNav.style.display = 'flex';
+            } else {
+                if (bookingWidget) bookingWidget.style.display = 'none';
+            }
+
+            // Show bottom nav on membership, offers, dining pages
+            const showBottomNavPages = ['page-home', 'page-membership', 'page-offers', 'page-dining'];
+            if (bottomNav) {
+                bottomNav.style.display = showBottomNavPages.includes(pageId) ? 'flex' : 'none';
+            }
+        };
+    </script>
+</body>
+</html>

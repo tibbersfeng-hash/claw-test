@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claw Test - 任务管理</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        /* 开场动画容器 */
+        .intro-container {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.6s ease-out, visibility 0.6s ease-out;
+        }
+
+        .intro-container.fade-out {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        /* Logo */
+        .intro-logo {
+            font-size: 4rem;
+            margin-bottom: 16px;
+            animation: logoEnter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            opacity: 0;
+            transform: scale(0.5);
+        }
+
+        @keyframes logoEnter {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* 标题 */
+        .intro-title {
+            color: white;
+            font-size: 2rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            opacity: 0;
+            transform: translateY(16px);
+            animation: textEnter 0.6s ease forwards;
+            animation-delay: 0.3s;
+        }
+
+        @keyframes textEnter {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 副标题 */
+        .intro-subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1rem;
+            margin-top: 8px;
+            opacity: 0;
+            animation: textEnter 0.6s ease forwards;
+            animation-delay: 0.5s;
+        }
+
+        /* 进度条 */
+        .progress-track {
+            margin-top: 40px;
+            width: 180px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            overflow: hidden;
+            opacity: 0;
+            animation: textEnter 0.4s ease forwards;
+            animation-delay: 0.7s;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0;
+            background: white;
+            border-radius: 2px;
+            animation: progressRun 2s ease-in-out forwards;
+            animation-delay: 0.9s;
+        }
+
+        @keyframes progressRun {
+            to {
+                width: 100%;
+            }
+        }
+
+        /* 响应式 */
+        @media (max-width: 640px) {
+            .intro-logo {
+                font-size: 3rem;
+            }
+            .intro-title {
+                font-size: 1.5rem;
+            }
+            .intro-subtitle {
+                font-size: 0.875rem;
+            }
+            .progress-track {
+                width: 140px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="intro-container" id="intro">
+        <div class="intro-logo">🦀</div>
+        <h1 class="intro-title">Claw Test</h1>
+        <p class="intro-subtitle">任务管理系统</p>
+        <div class="progress-track">
+            <div class="progress-fill"></div>
+        </div>
+    </div>
+
+    <script>
+        const intro = document.getElementById('intro');
+
+        // 3秒后淡出并跳转
+        setTimeout(() => {
+            intro.classList.add('fade-out');
+            setTimeout(() => {
+                window.location.href = '/tasks.html';
+            }, 600);
+        }, 3000);
+    </script>
+</body>
+</html>

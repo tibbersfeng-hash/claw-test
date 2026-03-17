@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="500" viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- 背景渐变 -->
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea"/>
+      <stop offset="100%" style="stop-color:#764ba2"/>
+    </linearGradient>
+
+    <!-- 装饰圆圈渐变 -->
+    <radialGradient id="circleGradient">
+      <stop offset="0%" style="stop-color:rgba(255,255,255,0.15)"/>
+      <stop offset="100%" style="stop-color:rgba(255,255,255,0.05)"/>
+    </radialGradient>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="url(#bgGradient)"/>
+
+  <!-- 装饰圆圈 -->
+  <circle cx="50" cy="50" r="150" fill="url(#circleGradient)" opacity="0.5">
+    <animate attributeName="cy" values="50;30;50" dur="6s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="750" cy="450" r="100" fill="url(#circleGradient)" opacity="0.4">
+    <animate attributeName="cy" values="450;430;450" dur="5s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="700" cy="200" r="75" fill="url(#circleGradient)" opacity="0.3">
+    <animate attributeName="cy" values="200;180;200" dur="7s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Logo (螃蟹 emoji) -->
+  <text x="400" y="180" text-anchor="middle" font-size="80" font-family="Arial">
+    🦀
+    <animate attributeName="font-size" values="80;88;80" dur="1.5s" repeatCount="indefinite"/>
+  </text>
+
+  <!-- 标题 -->
+  <text x="400" y="270" text-anchor="middle" font-size="40" font-weight="bold" fill="white" font-family="Arial, sans-serif">
+    Claw Test
+  </text>
+
+  <!-- 副标题 -->
+  <text x="400" y="310" text-anchor="middle" font-size="18" fill="rgba(255,255,255,0.8)" font-family="Arial, sans-serif">
+    任务管理系统
+  </text>
+
+  <!-- 进度条背景 -->
+  <rect x="300" y="350" width="200" height="4" rx="2" fill="rgba(255,255,255,0.2)"/>
+
+  <!-- 进度条 -->
+  <rect x="300" y="350" width="0" height="4" rx="2" fill="white">
+    <animate attributeName="width" values="0;200;200;0" dur="3s" repeatCount="indefinite"/>
+  </rect>
+
+  <!-- 加载文字 -->
+  <text x="400" y="380" text-anchor="middle" font-size="14" fill="rgba(255,255,255,0.7)" font-family="Arial, sans-serif">
+    正在加载...
+  </text>
+
+  <!-- 时间线说明 -->
+  <text x="400" y="450" text-anchor="middle" font-size="12" fill="rgba(255,255,255,0.5)" font-family="Arial, sans-serif">
+    动画时长: 3秒 → 淡出 0.5秒 → 跳转到任务列表
+  </text>
+
+  <!-- 边框 -->
+  <rect x="1" y="1" width="798" height="498" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2" rx="8"/>
+</svg>

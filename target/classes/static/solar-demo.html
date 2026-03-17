@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>太阳系动画演示 v2</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* 深空背景 */
+        .space-bg {
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 20% 80%, rgba(120, 0, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(0, 200, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(20, 20, 40, 1) 0%, #000 100%);
+        }
+
+        /* 星云效果 */
+        .nebula {
+            position: fixed;
+            inset: 0;
+            opacity: 0.4;
+            background:
+                radial-gradient(circle at 30% 70%, rgba(255, 100, 150, 0.2) 0%, transparent 40%),
+                radial-gradient(circle at 70% 30%, rgba(100, 150, 255, 0.2) 0%, transparent 40%);
+            filter: blur(60px);
+            animation: nebulaPulse 8s ease-in-out infinite;
+        }
+
+        @keyframes nebulaPulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.1); }
+        }
+
+        /* 太阳系容器 */
+        .solar-system {
+            position: relative;
+            width: 600px;
+            height: 600px;
+        }
+
+        /* 太阳 - 抽象发光核心 */
+        .sun {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle,
+                #fff 0%,
+                #fffae6 20%,
+                #ffd700 40%,
+                #ff8c00 60%,
+                transparent 70%
+            );
+            border-radius: 50%;
+            animation: sunGlow 4s ease-in-out infinite;
+        }
+
+        .sun::before {
+            content: '';
+            position: absolute;
+            inset: -40px;
+            background: radial-gradient(circle,
+                rgba(255, 200, 100, 0.4) 0%,
+                rgba(255, 150, 50, 0.2) 30%,
+                transparent 60%
+            );
+            border-radius: 50%;
+            animation: sunCorona 3s ease-in-out infinite alternate;
+        }
+
+        .sun::after {
+            content: '';
+            position: absolute;
+            inset: -80px;
+            background: radial-gradient(circle,
+                rgba(255, 180, 80, 0.15) 0%,
+                transparent 50%
+            );
+            border-radius: 50%;
+        }
+
+        @keyframes sunGlow {
+            0%, 100% { filter: brightness(1) drop-shadow(0 0 30px rgba(255, 200, 100, 0.8)); }
+            50% { filter: brightness(1.2) drop-shadow(0 0 50px rgba(255, 200, 100, 1)); }
+        }
+
+        @keyframes sunCorona {
+            0% { transform: scale(1) rotate(0deg); opacity: 0.6; }
+            100% { transform: scale(1.2) rotate(180deg); opacity: 0.8; }
+        }
+
+        /* 轨道 - 抽象光环 */
+        .orbit {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            border: 1px solid transparent;
+            background: linear-gradient(var(--orbit-color), transparent) border-box;
+            mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            opacity: 0.6;
+        }
+
+        .orbit::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 50%;
+            background: linear-gradient(90deg, transparent, var(--orbit-glow), transparent);
+            opacity: 0.3;
+            animation: orbitGlow 4s linear infinite;
+        }
+
+        @keyframes orbitGlow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* 行星轨道容器 */
+        .planet-orbit {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform-origin: center center;
+        }
+
+        /* 行星 - 抽象光点 */
+        .planet {
+            position: absolute;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .planet::before {
+            content: '';
+            position: absolute;
+            inset: -100%;
+            background: radial-gradient(circle, var(--planet-glow) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        /* 轨道尾迹 */
+        .trail {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 40px;
+            background: linear-gradient(to top, var(--trail-color), transparent);
+            border-radius: 2px;
+            opacity: 0.6;
+        }
+
+        /* 行星1 - 内圈 */
+        .orbit-1 { width: 120px; height: 120px; --orbit-color: rgba(255, 150, 200, 0.3); --orbit-glow: rgba(255, 150, 200, 0.5); }
+        .planet-orbit-1 { width: 120px; height: 120px; animation: orbit 6s linear infinite; }
+        .planet-1 {
+            top: 0; left: 50%;
+            width: 6px; height: 6px;
+            background: #ff9ec4;
+            --planet-glow: rgba(255, 158, 196, 0.6);
+            box-shadow: 0 0 10px #ff9ec4, 0 0 20px rgba(255, 158, 196, 0.5);
+        }
+        .trail-1 { --trail-color: rgba(255, 158, 196, 0.4); }
+
+        /* 行星2 */
+        .orbit-2 { width: 180px; height: 180px; --orbit-color: rgba(255, 200, 100, 0.3); --orbit-glow: rgba(255, 200, 100, 0.5); }
+        .planet-orbit-2 { width: 180px; height: 180px; animation: orbit 9s linear infinite; }
+        .planet-2 {
+            top: 0; left: 50%;
+            width: 10px; height: 10px;
+            background: #ffc864;
+            --planet-glow: rgba(255, 200, 100, 0.6);
+            box-shadow: 0 0 15px #ffc864, 0 0 30px rgba(255, 200, 100, 0.4);
+        }
+        .trail-2 { --trail-color: rgba(255, 200, 100, 0.4); height: 50px; }
+
+        /* 行星3 - 地球蓝 */
+        .orbit-3 { width: 250px; height: 250px; --orbit-color: rgba(100, 200, 255, 0.3); --orbit-glow: rgba(100, 200, 255, 0.5); }
+        .planet-orbit-3 { width: 250px; height: 250px; animation: orbit 12s linear infinite; }
+        .planet-3 {
+            top: 0; left: 50%;
+            width: 12px; height: 12px;
+            background: #64c8ff;
+            --planet-glow: rgba(100, 200, 255, 0.6);
+            box-shadow: 0 0 15px #64c8ff, 0 0 30px rgba(100, 200, 255, 0.5);
+        }
+        .trail-3 { --trail-color: rgba(100, 200, 255, 0.4); height: 60px; }
+
+        /* 行星4 */
+        .orbit-4 { width: 320px; height: 320px; --orbit-color: rgba(200, 100, 255, 0.3); --orbit-glow: rgba(200, 100, 255, 0.5); }
+        .planet-orbit-4 { width: 320px; height: 320px; animation: orbit 16s linear infinite; }
+        .planet-4 {
+            top: 0; left: 50%;
+            width: 8px; height: 8px;
+            background: #c864ff;
+            --planet-glow: rgba(200, 100, 255, 0.6);
+            box-shadow: 0 0 12px #c864ff, 0 0 25px rgba(200, 100, 255, 0.4);
+        }
+        .trail-4 { --trail-color: rgba(200, 100, 255, 0.4); height: 45px; }
+
+        /* 行星5 - 大型 */
+        .orbit-5 { width: 400px; height: 400px; --orbit-color: rgba(255, 100, 150, 0.25); --orbit-glow: rgba(255, 100, 150, 0.4); }
+        .planet-orbit-5 { width: 400px; height: 400px; animation: orbit 20s linear infinite; }
+        .planet-5 {
+            top: 0; left: 50%;
+            width: 18px; height: 18px;
+            background: radial-gradient(circle at 30% 30%, #ff8fab, #ff6496);
+            --planet-glow: rgba(255, 100, 150, 0.5);
+            box-shadow: 0 0 20px #ff6496, 0 0 40px rgba(255, 100, 150, 0.3);
+        }
+        .trail-5 { --trail-color: rgba(255, 100, 150, 0.3); height: 70px; }
+
+        /* 行星6 - 外圈 */
+        .orbit-6 { width: 480px; height: 480px; --orbit-color: rgba(100, 255, 200, 0.2); --orbit-glow: rgba(100, 255, 200, 0.4); }
+        .planet-orbit-6 { width: 480px; height: 480px; animation: orbit 25s linear infinite; }
+        .planet-6 {
+            top: 0; left: 50%;
+            width: 14px; height: 14px;
+            background: #64ffc8;
+            --planet-glow: rgba(100, 255, 200, 0.5);
+            box-shadow: 0 0 18px #64ffc8, 0 0 35px rgba(100, 255, 200, 0.3);
+        }
+        .trail-6 { --trail-color: rgba(100, 255, 200, 0.3); height: 55px; }
+
+        /* 行星7 - 最外圈 */
+        .orbit-7 { width: 550px; height: 550px; --orbit-color: rgba(180, 180, 255, 0.15); --orbit-glow: rgba(180, 180, 255, 0.3); }
+        .planet-orbit-7 { width: 550px; height: 550px; animation: orbit 30s linear infinite; }
+        .planet-7 {
+            top: 0; left: 50%;
+            width: 10px; height: 10px;
+            background: #b4b4ff;
+            --planet-glow: rgba(180, 180, 255, 0.5);
+            box-shadow: 0 0 15px #b4b4ff, 0 0 30px rgba(180, 180, 255, 0.3);
+        }
+        .trail-7 { --trail-color: rgba(180, 180, 255, 0.25); height: 50px; }
+
+        @keyframes orbit {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* 背景星星 */
+        .stars {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .star.twinkle {
+            animation: twinkle 3s ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.5); }
+        }
+
+        /* 流星 */
+        .meteor {
+            position: fixed;
+            width: 2px;
+            height: 80px;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.8), transparent);
+            transform: rotate(-45deg);
+            animation: meteor 4s linear infinite;
+            opacity: 0;
+        }
+
+        @keyframes meteor {
+            0% { opacity: 0; transform: translateX(0) translateY(0) rotate(-45deg); }
+            10% { opacity: 1; }
+            30% { opacity: 0; }
+            100% { opacity: 0; transform: translateX(-300px) translateY(300px) rotate(-45deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="space-bg"></div>
+    <div class="nebula"></div>
+    <div class="stars" id="stars"></div>
+
+    <div class="solar-system">
+        <!-- 轨道 -->
+        <div class="orbit orbit-1"></div>
+        <div class="orbit orbit-2"></div>
+        <div class="orbit orbit-3"></div>
+        <div class="orbit orbit-4"></div>
+        <div class="orbit orbit-5"></div>
+        <div class="orbit orbit-6"></div>
+        <div class="orbit orbit-7"></div>
+
+        <!-- 太阳 -->
+        <div class="sun"></div>
+
+        <!-- 行星 -->
+        <div class="planet-orbit planet-orbit-1">
+            <div class="trail trail-1"></div>
+            <div class="planet planet-1"></div>
+        </div>
+        <div class="planet-orbit planet-orbit-2">
+            <div class="trail trail-2"></div>
+            <div class="planet planet-2"></div>
+        </div>
+        <div class="planet-orbit planet-orbit-3">
+            <div class="trail trail-3"></div>
+            <div class="planet planet-3"></div>
+        </div>
+        <div class="planet-orbit planet-orbit-4">
+            <div class="trail trail-4"></div>
+            <div class="planet planet-4"></div>
+        </div>
+        <div class="planet-orbit planet-orbit-5">
+            <div class="trail trail-5"></div>
+            <div class="planet planet-5"></div>
+        </div>
+        <div class="planet-orbit planet-orbit-6">
+            <div class="trail trail-6"></div>
+            <div class="planet planet-6"></div>
+        </div>
+        <div class="planet-orbit planet-orbit-7">
+            <div class="trail trail-7"></div>
+            <div class="planet planet-7"></div>
+        </div>
+    </div>
+
+    <!-- 流星 -->
+    <div class="meteor" style="top: 10%; left: 80%; animation-delay: 0s;"></div>
+    <div class="meteor" style="top: 30%; left: 90%; animation-delay: 2s;"></div>
+    <div class="meteor" style="top: 5%; left: 60%; animation-delay: 5s;"></div>
+
+    <script>
+        // 生成星星
+        const starsContainer = document.getElementById('stars');
+        for (let i = 0; i < 150; i++) {
+            const star = document.createElement('div');
+            star.className = 'star' + (Math.random() > 0.7 ? ' twinkle' : '');
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            const size = Math.random() * 2 + 0.5;
+            star.style.width = size + 'px';
+            star.style.height = size + 'px';
+            star.style.opacity = Math.random() * 0.5 + 0.2;
+            star.style.animationDelay = Math.random() * 3 + 's';
+            starsContainer.appendChild(star);
+        }
+    </script>
+</body>
+</html>

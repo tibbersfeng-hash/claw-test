@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试页面</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <h1>🧪 测试页面</h1>
+    <div id="result">加载中...</div>
+    
+    <script src="/js/layout.js"></script>
+    <script>
+        console.log('脚本开始执行');
+        
+        async function test() {
+            try {
+                const response = await fetch('/api/tasks?page=0&size=10', {
+                    headers: { 'X-API-Key': 'sk-9800eb048ad0446b8030e262efad9498' }
+                });
+                const data = await response.json();
+                document.getElementById('result').innerHTML = 
+                    '<p>API 返回 ' + data.content.length + ' 个任务</p>' +
+                    '<ul>' + data.content.map(t => '<li>#' + t.id + ' - ' + t.status + '</li>').join('') + '</ul>';
+                console.log('数据加载成功:', data.content.length, '个任务');
+            } catch (e) {
+                document.getElementById('result').textContent = '错误: ' + e.message;
+                console.error('错误:', e);
+            }
+        }
+        
+        test();
+    </script>
+</body>
+</html>

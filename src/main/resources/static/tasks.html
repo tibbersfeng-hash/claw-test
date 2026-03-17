@@ -7,7 +7,7 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; min-height: 100vh; padding: 20px; }
-        .container { max-width: 900px; margin: 0 auto; }
+        .container { max-width: 1000px; margin: 0 auto; }
         h1 { color: #333; margin-bottom: 20px; text-align: center; }
         .nav { margin-bottom: 20px; text-align: center; }
         .nav a { color: #4a90d9; text-decoration: none; margin: 0 10px; }
@@ -16,9 +16,11 @@
         .card-title { font-size: 18px; font-weight: 600; color: #333; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 5px; color: #666; font-size: 14px; }
-        .form-group input, .form-group textarea { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; transition: border-color 0.2s; }
-        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #4a90d9; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; transition: border-color 0.2s; }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: #4a90d9; }
         .form-group textarea { resize: vertical; min-height: 100px; }
+        .form-row { display: flex; gap: 15px; }
+        .form-row .form-group { flex: 1; }
         .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
         .btn-primary { background: #4a90d9; color: white; }
         .btn-primary:hover { background: #357abd; }
@@ -30,26 +32,43 @@
         .btn-danger:hover { background: #d9363e; }
         .btn-info { background: #722ed1; color: white; }
         .btn-info:hover { background: #531dab; }
+        .btn-secondary { background: #8c8c8c; color: white; }
+        .btn-secondary:hover { background: #595959; }
         .btn-sm { padding: 6px 12px; font-size: 12px; }
-        .filter-bar { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
+        .filter-bar { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; margin-bottom: 15px; }
         .filter-bar select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
         .task-list { list-style: none; }
         .task-item { padding: 15px; border: 1px solid #eee; border-radius: 6px; margin-bottom: 10px; }
         .task-item:hover { border-color: #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .task-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
         .task-content { font-size: 16px; color: #333; flex: 1; margin-right: 10px; white-space: pre-wrap; word-break: break-word; }
-        .task-meta { display: flex; gap: 15px; font-size: 12px; color: #999; margin-bottom: 10px; }
+        .task-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+        .task-meta { display: flex; gap: 15px; font-size: 12px; color: #999; margin-bottom: 10px; flex-wrap: wrap; }
         .task-remark { font-size: 14px; color: #666; background: #f9f9f9; padding: 8px 10px; border-radius: 4px; margin-top: 10px; }
         .task-actions { margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; }
         .status { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; }
-        .status-INIT { background: #e6f7ff; color: #1890ff; }
+        .status-PENDING { background: #e6f7ff; color: #1890ff; }
         .status-IN_PROGRESS { background: #fff7e6; color: #fa8c16; }
         .status-COMPLETED { background: #f6ffed; color: #52c41a; }
+        .status-REJECTED { background: #fff1f0; color: #f5222d; }
+        .status-CLOSED { background: #f5f5f5; color: #8c8c8c; }
+        .status-INIT { background: #e6f7ff; color: #1890ff; }
+        .task-type { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+        .type-REQ { background: #e6f7ff; color: #1890ff; }
+        .type-DES { background: #f9f0ff; color: #722ed1; }
+        .type-DEV { background: #f6ffed; color: #52c41a; }
+        .type-TEST { background: #fff7e6; color: #fa8c16; }
+        .type-BUG { background: #fff1f0; color: #f5222d; }
+        .type-ACCEPT { background: #e6fffb; color: #13c2c2; }
+        .type-REL { background: #f0f5ff; color: #2f54eb; }
         .identity-type { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; margin-left: 6px; }
         .identity-PM { background: #f0f5ff; color: #2f54eb; }
         .identity-OPS { background: #fff1f0; color: #f5222d; }
         .identity-DEV { background: #f6ffed; color: #52c41a; }
         .identity-QA { background: #fff0f6; color: #eb2f96; }
+        .identity-UI { background: #f9f0ff; color: #722ed1; }
+        .parent-link { color: #4a90d9; text-decoration: none; font-size: 12px; }
+        .parent-link:hover { text-decoration: underline; }
         .pagination { display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
         .pagination button { padding: 8px 15px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; }
         .pagination button:hover:not(:disabled) { background: #f5f5f5; }
@@ -81,6 +100,7 @@
         .design-doc-meta { font-size: 12px; color: #999; margin-bottom: 8px; }
         .design-doc-preview { font-size: 13px; color: #666; background: #f5f5f5; padding: 10px; border-radius: 4px; max-height: 100px; overflow: hidden; text-overflow: ellipsis; }
         .design-doc-actions { margin-top: 8px; display: flex; gap: 8px; }
+        .chain-item { padding: 10px; border-left: 3px solid #4a90d9; margin-left: 15px; margin-bottom: 8px; background: #fafafa; }
     </style>
 </head>
 <body>
@@ -108,11 +128,46 @@
                     <label for="content">任务内容</label>
                     <textarea id="content" placeholder="请输入任务内容（支持多行）" required maxlength="1000"></textarea>
                 </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="taskType">任务类型</label>
+                        <select id="taskType">
+                            <option value="REQ">REQ - 需求任务</option>
+                            <option value="DES">DES - 设计任务</option>
+                            <option value="DEV">DEV - 开发任务</option>
+                            <option value="TEST">TEST - 测试任务</option>
+                            <option value="BUG">BUG - 缺陷任务</option>
+                            <option value="ACCEPT">ACCEPT - 验收任务</option>
+                            <option value="REL">REL - 发布任务</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="projectId">关联项目</label>
+                        <select id="projectId">
+                            <option value="">无</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="assigneeRole">执行者角色</label>
+                        <select id="assigneeRole">
+                            <option value="">自动分配</option>
+                            <option value="PM">PM - 产品经理</option>
+                            <option value="UI">UI - 设计师</option>
+                            <option value="DEV">DEV - 开发者</option>
+                            <option value="QA">QA - 测试工程师</option>
+                            <option value="OPS">OPS - 运维工程师</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="priority">优先级 (0-10)</label>
+                        <input type="number" id="priority" min="0" max="10" value="0" placeholder="数字越大优先级越高">
+                    </div>
+                </div>
                 <div class="form-group">
-                    <label for="projectId">关联项目</label>
-                    <select id="projectId">
-                        <option value="">无</option>
-                    </select>
+                    <label for="imageUrls">图片链接 (多个用逗号分隔)</label>
+                    <input type="text" id="imageUrls" placeholder="飞书图片链接，多个用逗号分隔">
                 </div>
                 <button type="submit" class="btn btn-primary">创建任务</button>
             </form>
@@ -122,28 +177,34 @@
         <div class="card">
             <div class="card-title">任务列表</div>
             <div class="filter-bar">
-                <label>状态筛选：</label>
+                <label>状态：</label>
                 <select id="statusFilter">
                     <option value="">全部</option>
-                    <option value="INIT">初始化</option>
-                    <option value="IN_PROGRESS">进行中</option>
+                    <option value="PENDING">待处理</option>
+                    <option value="IN_PROGRESS">处理中</option>
                     <option value="COMPLETED">已完成</option>
+                    <option value="REJECTED">已拒绝</option>
+                    <option value="CLOSED">已关闭</option>
                 </select>
-                <label style="margin-left: 15px;">创建者筛选：</label>
-                <select id="creatorTypeFilter">
+                <label style="margin-left: 15px;">类型：</label>
+                <select id="taskTypeFilter">
                     <option value="">全部</option>
-                    <option value="PM">产品经理</option>
-                    <option value="OPS">运维</option>
-                    <option value="DEV">开发</option>
-                    <option value="QA">测试</option>
+                    <option value="REQ">REQ - 需求</option>
+                    <option value="DES">DES - 设计</option>
+                    <option value="DEV">DEV - 开发</option>
+                    <option value="TEST">TEST - 测试</option>
+                    <option value="BUG">BUG - 缺陷</option>
+                    <option value="ACCEPT">ACCEPT - 验收</option>
+                    <option value="REL">REL - 发布</option>
                 </select>
-                <label style="margin-left: 15px;">处理人筛选：</label>
-                <select id="handlerTypeFilter">
+                <label style="margin-left: 15px;">执行者：</label>
+                <select id="assigneeRoleFilter">
                     <option value="">全部</option>
-                    <option value="PM">产品经理</option>
-                    <option value="OPS">运维</option>
-                    <option value="DEV">开发</option>
-                    <option value="QA">测试</option>
+                    <option value="PM">PM</option>
+                    <option value="UI">UI</option>
+                    <option value="DEV">DEV</option>
+                    <option value="QA">QA</option>
+                    <option value="OPS">OPS</option>
                 </select>
             </div>
             <ul class="task-list" id="taskList"></ul>
@@ -172,16 +233,35 @@
             <div class="modal-header">完成任务</div>
             <div class="form-group">
                 <label for="remark">完成备注</label>
-                <textarea id="remark" placeholder="请输入完成备注（可选）" maxlength="500"></textarea>
+                <textarea id="remark" placeholder="请输入完成备注（可选）" maxlength="2000"></textarea>
             </div>
             <div class="form-group">
-                <label for="designContent">设计内容（Markdown格式）</label>
-                <textarea id="designContent" placeholder="请输入设计内容，支持 Markdown 格式&#10;&#10;示例：&#10;# 模块设计&#10;&#10;## 概述&#10;功能说明...&#10;&#10;## 实现方案&#10;1. 步骤一&#10;2. 步骤二" maxlength="10000" style="min-height: 200px;"></textarea>
-                <div class="hint-text">DEV完成任务时填写设计内容，将自动创建设计文档</div>
+                <label for="completeImageUrls">图片链接</label>
+                <input type="text" id="completeImageUrls" placeholder="飞书图片链接，多个用逗号分隔">
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="createNextTask" checked> 自动创建下一阶段任务
+                </label>
             </div>
             <div class="modal-actions">
                 <button class="btn btn-cancel" onclick="closeCompleteModal()">取消</button>
                 <button class="btn btn-success" onclick="confirmComplete()">确认完成</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 拒绝任务模态框 -->
+    <div class="modal" id="rejectModal">
+        <div class="modal-content">
+            <div class="modal-header">拒绝任务</div>
+            <div class="form-group">
+                <label for="rejectRemark">拒绝原因</label>
+                <textarea id="rejectRemark" placeholder="请输入拒绝原因" maxlength="500"></textarea>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="closeRejectModal()">取消</button>
+                <button class="btn btn-danger" onclick="confirmReject()">确认拒绝</button>
             </div>
         </div>
     </div>
@@ -194,6 +274,20 @@
             <div class="modal-actions">
                 <button class="btn btn-cancel" onclick="closeDeleteModal()">取消</button>
                 <button class="btn btn-danger" onclick="confirmDelete()">确认删除</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 任务链模态框 -->
+    <div class="modal" id="chainModal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <span>🔗 任务链</span>
+                <span class="modal-close" onclick="closeChainModal()">&times;</span>
+            </div>
+            <div id="chainContent"></div>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="closeChainModal()">关闭</button>
             </div>
         </div>
     </div>
@@ -241,6 +335,18 @@
         let currentStatus = '';
         let currentTaskId = null;
 
+        // 任务类型映射
+        const TASK_TYPE_MAP = {
+            'REQ': '需求任务', 'DES': '设计任务', 'DEV': '开发任务',
+            'TEST': '测试任务', 'BUG': '缺陷任务', 'ACCEPT': '验收任务', 'REL': '发布任务'
+        };
+
+        // 状态映射
+        const STATUS_MAP = {
+            'PENDING': '待处理', 'IN_PROGRESS': '处理中', 'COMPLETED': '已完成',
+            'REJECTED': '已拒绝', 'CLOSED': '已关闭', 'INIT': '初始化'
+        };
+
         function getApiKey() { return document.getElementById('apiKey').value.trim(); }
 
         function getHeaders() {
@@ -258,14 +364,14 @@
         }
 
         async function loadTasks() {
-            const typeFilter = document.getElementById('statusFilter').value;
-            const creatorTypeFilter = document.getElementById('creatorTypeFilter').value;
-            const handlerTypeFilter = document.getElementById('handlerTypeFilter').value;
-            currentStatus = typeFilter;
+            const statusFilter = document.getElementById('statusFilter').value;
+            const taskTypeFilter = document.getElementById('taskTypeFilter').value;
+            const assigneeRoleFilter = document.getElementById('assigneeRoleFilter').value;
+            currentStatus = statusFilter;
             let url = `${API_BASE}?page=${currentPage}&size=10`;
-            if (typeFilter) url += `&status=${typeFilter}`;
-            if (creatorTypeFilter) url += `&creatorType=${creatorTypeFilter}`;
-            if (handlerTypeFilter) url += `&handlerType=${handlerTypeFilter}`;
+            if (statusFilter) url += `&status=${statusFilter}`;
+            if (taskTypeFilter) url += `&taskType=${taskTypeFilter}`;
+            if (assigneeRoleFilter) url += `&assigneeRole=${assigneeRoleFilter}`;
             try {
                 const response = await fetch(url, { headers: getHeaders() });
                 if (response.status === 401) { showToast('请先输入有效的 API Key', true); return; }
@@ -282,20 +388,28 @@
                 <li class="task-item">
                     <div class="task-header">
                         <div class="task-content">${escapeHtml(task.content)}</div>
-                        <span class="status status-${task.status}">${getStatusText(task.status)}</span>
+                        <div class="task-badges">
+                            <span class="task-type type-${task.taskType || 'REQ'}">${TASK_TYPE_MAP[task.taskType] || task.taskType}</span>
+                            <span class="status status-${task.status}">${STATUS_MAP[task.status] || task.status}</span>
+                        </div>
                     </div>
                     <div class="task-meta">
                         <span>👤 ${escapeHtml(task.creator)}${getIdentityTypeBadge(task.creator)}</span>
                         ${task.handler ? `<span>🔧 ${escapeHtml(task.handler)}${getIdentityTypeBadge(task.handler)}</span>` : ''}
+                        ${task.assigneeRole ? `<span>📋 ${task.assigneeRole}</span>` : ''}
                         ${task.projectName ? `<span>📁 ${escapeHtml(task.projectName)}</span>` : ''}
+                        ${task.priority > 0 ? `<span>⭐ P${task.priority}</span>` : ''}
                         <span>📅 ${formatDate(task.createdAt)}</span>
                     </div>
+                    ${task.parentId ? `<div class="task-meta"><a class="parent-link" href="#" onclick="viewParentTask(${task.parentId}); return false;">↑ 父任务 #${task.parentId}</a></div>` : ''}
                     ${task.remark ? `<div class="task-remark">📝 ${escapeHtml(task.remark)}</div>` : ''}
                     <div class="task-actions">
-                        <button class="btn btn-warning btn-sm" onclick="openEditModal(${task.id}, ${escapeJsString(task.content)})">修改内容</button>
-                        ${task.status === 'INIT' ? `<button class="btn btn-primary btn-sm" onclick="startTask(${task.id})">开始任务</button>` : ''}
-                        ${task.status !== 'COMPLETED' ? `<button class="btn btn-success btn-sm" onclick="openCompleteModal(${task.id})">完成任务</button>` : ''}
-                        <button class="btn btn-info btn-sm" onclick="openDesignDocsModal(${task.id})">设计文档</button>
+                        <button class="btn btn-warning btn-sm" onclick="openEditModal(${task.id}, ${escapeJsString(task.content)})">修改</button>
+                        ${task.status === 'PENDING' ? `<button class="btn btn-primary btn-sm" onclick="startTask(${task.id})">开始</button>` : ''}
+                        ${task.status !== 'COMPLETED' && task.status !== 'CLOSED' ? `<button class="btn btn-success btn-sm" onclick="openCompleteModal(${task.id})">完成</button>` : ''}
+                        ${task.status !== 'COMPLETED' && task.status !== 'CLOSED' && task.status !== 'REJECTED' ? `<button class="btn btn-danger btn-sm" onclick="openRejectModal(${task.id})">拒绝</button>` : ''}
+                        <button class="btn btn-info btn-sm" onclick="viewTaskChain(${task.id})">任务链</button>
+                        <button class="btn btn-secondary btn-sm" onclick="openDesignDocsModal(${task.id})">文档</button>
                         <button class="btn btn-danger btn-sm" onclick="openDeleteModal(${task.id})">删除</button>
                     </div>
                 </li>
@@ -313,43 +427,62 @@
         }
 
         function goToPage(page) { currentPage = page; loadTasks(); }
-        function getStatusText(status) { return { 'INIT': '初始化', 'IN_PROGRESS': '进行中', 'COMPLETED': '已完成' }[status] || status; }
+
         function getIdentityTypeBadge(creator) {
             if (!creator) return '';
-            const typeMap = { 'PM': '产品经理', 'OPS': '运维', 'DEV': '开发', 'QA': '测试' };
+            const typeMap = { 'PM': '产品经理', 'OPS': '运维', 'DEV': '开发', 'QA': '测试', 'UI': '设计师' };
             const type = creator.split('-')[0];
             const typeName = typeMap[type] || type;
             return `<span class="identity-type identity-${type}">${typeName}</span>`;
         }
+
         function formatDate(dateStr) { if (!dateStr) return ''; return new Date(dateStr).toLocaleString('zh-CN'); }
         function escapeHtml(text) { if (!text) return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
         function escapeJsString(text) { if (!text) return "''"; return "'" + text.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\n/g, '\\n').replace(/\r/g, '\\r') + "'"; }
 
+        // 创建任务
         document.getElementById('createForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const content = document.getElementById('content').value.trim();
+            const taskType = document.getElementById('taskType').value;
             const projectId = document.getElementById('projectId').value;
+            const assigneeRole = document.getElementById('assigneeRole').value;
+            const priority = document.getElementById('priority').value;
+            const imageUrls = document.getElementById('imageUrls').value.trim();
+
             if (!content) { showToast('请填写任务内容', true); return; }
             if (!getApiKey()) { showToast('请先输入 API Key', true); return; }
+
             try {
-                const body = { content };
+                const body = { content, taskType };
                 if (projectId) body.projectId = parseInt(projectId);
+                if (assigneeRole) body.assigneeRole = assigneeRole;
+                if (priority) body.priority = parseInt(priority);
+                if (imageUrls) body.imageUrls = imageUrls;
+
                 const response = await fetch(API_BASE, {
                     method: 'POST',
                     headers: getHeaders(),
                     body: JSON.stringify(body)
                 });
-                if (response.ok) { showToast('任务创建成功'); document.getElementById('createForm').reset(); loadProjects(); currentPage = 0; loadTasks(); }
-                else { const error = await response.json(); showToast(error.message || '创建失败', true); }
+                if (response.ok) {
+                    showToast('任务创建成功');
+                    document.getElementById('createForm').reset();
+                    currentPage = 0;
+                    loadTasks();
+                } else {
+                    const error = await response.json();
+                    showToast(error.message || '创建失败', true);
+                }
             } catch (error) { showToast('创建任务失败', true); }
         });
 
+        // 筛选器事件
         document.getElementById('statusFilter').addEventListener('change', () => { currentPage = 0; loadTasks(); });
+        document.getElementById('taskTypeFilter').addEventListener('change', () => { currentPage = 0; loadTasks(); });
+        document.getElementById('assigneeRoleFilter').addEventListener('change', () => { currentPage = 0; loadTasks(); });
 
-        document.getElementById('creatorTypeFilter').addEventListener('change', () => { currentPage = 0; loadTasks(); });
-
-        document.getElementById('handlerTypeFilter').addEventListener('change', () => { currentPage = 0; loadTasks(); });
-
+        // 编辑任务
         function openEditModal(taskId, content) {
             currentTaskId = taskId;
             document.getElementById('editContent').value = content || '';
@@ -372,10 +505,12 @@
             } catch (error) { showToast('操作失败', true); }
         }
 
+        // 完成任务
         function openCompleteModal(taskId) {
             currentTaskId = taskId;
             document.getElementById('remark').value = '';
-            document.getElementById('designContent').value = '';
+            document.getElementById('completeImageUrls').value = '';
+            document.getElementById('createNextTask').checked = true;
             document.getElementById('completeModal').classList.add('active');
         }
         function closeCompleteModal() { document.getElementById('completeModal').classList.remove('active'); currentTaskId = null; }
@@ -383,24 +518,30 @@
         async function confirmComplete() {
             if (!currentTaskId) return;
             const remark = document.getElementById('remark').value.trim();
-            const designContent = document.getElementById('designContent').value.trim();
+            const imageUrls = document.getElementById('completeImageUrls').value.trim();
+            const createNextTask = document.getElementById('createNextTask').checked;
+
             try {
-                const body = { remark };
-                if (designContent) body.designContent = designContent;
+                const body = { remark, createNextTask };
+                if (imageUrls) body.imageUrls = imageUrls;
+
                 const response = await fetch(`${API_BASE}/${currentTaskId}/complete`, {
                     method: 'PUT',
                     headers: getHeaders(),
                     body: JSON.stringify(body)
                 });
                 if (response.ok) {
-                    showToast('任务已完成' + (designContent ? '，设计文档已创建' : ''));
+                    showToast('任务已完成');
                     closeCompleteModal();
                     loadTasks();
+                } else {
+                    const error = await response.json();
+                    showToast(error.message || '操作失败', true);
                 }
-                else { const error = await response.json(); showToast(error.message || '操作失败', true); }
             } catch (error) { showToast('操作失败', true); }
         }
 
+        // 开始任务
         async function startTask(taskId) {
             try {
                 const response = await fetch(`${API_BASE}/${taskId}/start`, {
@@ -412,6 +553,35 @@
             } catch (error) { showToast('操作失败', true); }
         }
 
+        // 拒绝任务
+        function openRejectModal(taskId) {
+            currentTaskId = taskId;
+            document.getElementById('rejectRemark').value = '';
+            document.getElementById('rejectModal').classList.add('active');
+        }
+        function closeRejectModal() { document.getElementById('rejectModal').classList.remove('active'); currentTaskId = null; }
+
+        async function confirmReject() {
+            if (!currentTaskId) return;
+            const remark = document.getElementById('rejectRemark').value.trim();
+            try {
+                const response = await fetch(`${API_BASE}/${currentTaskId}/reject`, {
+                    method: 'PUT',
+                    headers: getHeaders(),
+                    body: JSON.stringify({ remark })
+                });
+                if (response.ok) {
+                    showToast('任务已拒绝，已创建返工任务');
+                    closeRejectModal();
+                    loadTasks();
+                } else {
+                    const error = await response.json();
+                    showToast(error.message || '操作失败', true);
+                }
+            } catch (error) { showToast('操作失败', true); }
+        }
+
+        // 删除任务
         function openDeleteModal(taskId) {
             currentTaskId = taskId;
             document.getElementById('deleteModal').classList.add('active');
@@ -428,6 +598,61 @@
                 if (response.ok) { showToast('任务已删除'); closeDeleteModal(); loadTasks(); }
                 else { const error = await response.json(); showToast(error.message || '删除失败', true); }
             } catch (error) { showToast('删除失败', true); }
+        }
+
+        // 查看任务链
+        async function viewTaskChain(taskId) {
+            document.getElementById('chainModal').classList.add('active');
+            const chainContent = document.getElementById('chainContent');
+            chainContent.innerHTML = '<div class="empty-state">加载中...</div>';
+
+            try {
+                // 获取当前任务
+                const taskRes = await fetch(`${API_BASE}/${taskId}`, { headers: getHeaders() });
+                const task = await taskRes.json();
+
+                // 获取子任务
+                const chainRes = await fetch(`${API_BASE}/${taskId}/chain`, { headers: getHeaders() });
+                const children = await chainRes.json();
+
+                let html = `
+                    <div class="chain-item">
+                        <strong>#${task.id} [${TASK_TYPE_MAP[task.taskType] || task.taskType}]</strong>
+                        <span class="status status-${task.status}">${STATUS_MAP[task.status]}</span>
+                        <br>${escapeHtml(task.content)}
+                    </div>
+                `;
+
+                if (children.length > 0) {
+                    html += children.map(child => `
+                        <div class="chain-item" style="margin-left: 30px;">
+                            <strong>#${child.id} [${TASK_TYPE_MAP[child.taskType] || child.taskType}]</strong>
+                            <span class="status status-${child.status}">${STATUS_MAP[child.status]}</span>
+                            <br>${escapeHtml(child.content)}
+                        </div>
+                    `).join('');
+                } else {
+                    html += '<div style="margin-left: 30px; color: #999; padding: 10px;">暂无子任务</div>';
+                }
+
+                chainContent.innerHTML = html;
+            } catch (error) {
+                chainContent.innerHTML = '<div class="empty-state">加载失败</div>';
+            }
+        }
+        function closeChainModal() { document.getElementById('chainModal').classList.remove('active'); }
+
+        // 查看父任务
+        async function viewParentTask(parentId) {
+            try {
+                const response = await fetch(`${API_BASE}/${parentId}`, { headers: getHeaders() });
+                if (response.ok) {
+                    const task = await response.json();
+                    alert(`父任务 #${parentId}\n类型: ${TASK_TYPE_MAP[task.taskType]}\n状态: ${STATUS_MAP[task.status]}\n内容: ${task.content}`);
+                }
+            } catch (error) {
+                showToast('获取父任务失败', true);
+            }
         }
 
         // 设计文档相关功能

@@ -1,0 +1,29 @@
+server:
+  port: 8080
+  address: 0.0.0.0
+
+spring:
+  application:
+    name: claw-test
+
+  datasource:
+    url: jdbc:sqlite:/opt/codegspace/claw-test/data/tasks.db
+    driver-class-name: org.sqlite.JDBC
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
+
+logging:
+  level:
+    root: INFO
+    com.openclaw: DEBUG
+  file:
+    name: /opt/codegspace/claw-test/logs/claw-test.log
+    max-size: 10MB
+    max-history: 30
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
