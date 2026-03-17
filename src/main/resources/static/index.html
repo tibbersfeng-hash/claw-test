@@ -6,17 +6,23 @@
     <title>Claw Test - 任务管理</title>
     <link rel="stylesheet" href="/css/styles.css">
     <style>
-        /* 开场动画容器 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         .intro-container {
             position: fixed;
             inset: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: radial-gradient(ellipse at center, #1a1a2e 0%, #0f0f1a 100%);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             z-index: 9999;
-            transition: opacity 0.6s ease-out, visibility 0.6s ease-out;
+            transition: opacity 0.8s ease-out, visibility 0.8s ease-out;
+            overflow: hidden;
         }
 
         .intro-container.fade-out {
@@ -24,71 +30,67 @@
             visibility: hidden;
         }
 
-        /* Logo */
-        .intro-logo {
-            font-size: 4rem;
-            margin-bottom: 16px;
-            animation: logoEnter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-            opacity: 0;
-            transform: scale(0.5);
+        #solarCanvas {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
 
-        @keyframes logoEnter {
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
+        .intro-text {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            margin-top: 20px;
         }
 
-        /* 标题 */
         .intro-title {
             color: white;
             font-size: 2rem;
             font-weight: 600;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.1em;
             opacity: 0;
-            transform: translateY(16px);
-            animation: textEnter 0.6s ease forwards;
-            animation-delay: 0.3s;
+            transform: translateY(20px);
+            animation: textFadeIn 0.8s ease forwards;
+            animation-delay: 1.5s;
+            text-shadow: 0 0 30px rgba(255, 200, 100, 0.3);
         }
 
-        @keyframes textEnter {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* 副标题 */
         .intro-subtitle {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
             margin-top: 8px;
             opacity: 0;
-            animation: textEnter 0.6s ease forwards;
-            animation-delay: 0.5s;
+            animation: textFadeIn 0.8s ease forwards;
+            animation-delay: 1.8s;
         }
 
-        /* 进度条 */
         .progress-track {
-            margin-top: 40px;
-            width: 180px;
-            height: 3px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 2px;
+            margin-top: 32px;
+            width: 160px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 1px;
             overflow: hidden;
             opacity: 0;
-            animation: textEnter 0.4s ease forwards;
-            animation-delay: 0.7s;
+            animation: textFadeIn 0.5s ease forwards;
+            animation-delay: 2s;
         }
 
         .progress-fill {
             height: 100%;
             width: 0;
-            background: white;
-            border-radius: 2px;
-            animation: progressRun 2s ease-in-out forwards;
-            animation-delay: 0.9s;
+            background: linear-gradient(90deg, #ffd700, #ff8c00);
+            border-radius: 1px;
+            animation: progressRun 2.5s ease forwards;
+            animation-delay: 2.2s;
+        }
+
+        @keyframes textFadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         @keyframes progressRun {
@@ -97,43 +99,183 @@
             }
         }
 
-        /* 响应式 */
         @media (max-width: 640px) {
-            .intro-logo {
-                font-size: 3rem;
-            }
             .intro-title {
                 font-size: 1.5rem;
             }
             .intro-subtitle {
-                font-size: 0.875rem;
-            }
-            .progress-track {
-                width: 140px;
+                font-size: 0.8rem;
             }
         }
     </style>
 </head>
 <body>
     <div class="intro-container" id="intro">
-        <div class="intro-logo">🦀</div>
-        <h1 class="intro-title">Claw Test</h1>
-        <p class="intro-subtitle">任务管理系统</p>
-        <div class="progress-track">
-            <div class="progress-fill"></div>
+        <canvas id="solarCanvas"></canvas>
+        <div class="intro-text">
+            <h1 class="intro-title">Claw Test</h1>
+            <p class="intro-subtitle">任务管理系统</p>
+            <div class="progress-track">
+                <div class="progress-fill"></div>
+            </div>
         </div>
     </div>
 
     <script>
-        const intro = document.getElementById('intro');
+        const canvas = document.getElementById('solarCanvas');
+        const ctx = canvas.getContext('2d');
 
-        // 3秒后淡出并跳转
+        // 设置画布大小
+        function resize() {
+            const size = Math.min(window.innerWidth, window.innerHeight) * 0.6;
+            canvas.width = size;
+            canvas.height = size;
+        }
+        resize();
+        window.addEventListener('resize', resize);
+
+        // 行星数据
+        const planets = [
+            { name: 'Mercury', orbit: 0.15, speed: 0.04, size: 3, color: '#b5b5b5' },
+            { name: 'Venus', orbit: 0.22, speed: 0.03, size: 5, color: '#e6c87a' },
+            { name: 'Earth', orbit: 0.30, speed: 0.02, size: 5, color: '#6b93d6' },
+            { name: 'Mars', orbit: 0.38, speed: 0.016, size: 4, color: '#c1440e' },
+            { name: 'Jupiter', orbit: 0.50, speed: 0.008, size: 12, color: '#d8ca9d' },
+            { name: 'Saturn', orbit: 0.62, speed: 0.006, size: 10, color: '#f4d59e', ring: true },
+            { name: 'Uranus', orbit: 0.74, speed: 0.004, size: 7, color: '#d1e7e7' },
+            { name: 'Neptune', orbit: 0.86, speed: 0.003, size: 7, color: '#5b5ddf' }
+        ];
+
+        let time = 0;
+        const centerX = () => canvas.width / 2;
+        const centerY = () => canvas.height / 2;
+
+        // 绘制太阳
+        function drawSun() {
+            const cx = centerX();
+            const cy = centerY();
+            const sunRadius = canvas.width * 0.06;
+
+            // 太阳光晕
+            const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, sunRadius * 3);
+            gradient.addColorStop(0, 'rgba(255, 200, 50, 0.8)');
+            gradient.addColorStop(0.3, 'rgba(255, 150, 0, 0.3)');
+            gradient.addColorStop(1, 'rgba(255, 100, 0, 0)');
+            ctx.beginPath();
+            ctx.arc(cx, cy, sunRadius * 3, 0, Math.PI * 2);
+            ctx.fillStyle = gradient;
+            ctx.fill();
+
+            // 太阳本体
+            const sunGradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, sunRadius);
+            sunGradient.addColorStop(0, '#fff5e0');
+            sunGradient.addColorStop(0.5, '#ffd700');
+            sunGradient.addColorStop(1, '#ff8c00');
+            ctx.beginPath();
+            ctx.arc(cx, cy, sunRadius, 0, Math.PI * 2);
+            ctx.fillStyle = sunGradient;
+            ctx.fill();
+        }
+
+        // 绘制轨道
+        function drawOrbits() {
+            const cx = centerX();
+            const cy = centerY();
+            const baseRadius = canvas.width * 0.06;
+
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+            ctx.lineWidth = 1;
+
+            planets.forEach(planet => {
+                const orbitRadius = baseRadius + canvas.width * planet.orbit;
+                ctx.beginPath();
+                ctx.arc(cx, cy, orbitRadius, 0, Math.PI * 2);
+                ctx.stroke();
+            });
+        }
+
+        // 绘制行星
+        function drawPlanets() {
+            const cx = centerX();
+            const cy = centerY();
+            const baseRadius = canvas.width * 0.06;
+
+            planets.forEach(planet => {
+                const orbitRadius = baseRadius + canvas.width * planet.orbit;
+                const angle = time * planet.speed;
+                const x = cx + Math.cos(angle) * orbitRadius;
+                const y = cy + Math.sin(angle) * orbitRadius;
+
+                // 行星阴影/光晕
+                const glow = ctx.createRadialGradient(x, y, 0, x, y, planet.size * 2);
+                glow.addColorStop(0, planet.color);
+                glow.addColorStop(1, 'transparent');
+                ctx.beginPath();
+                ctx.arc(x, y, planet.size * 2, 0, Math.PI * 2);
+                ctx.fillStyle = glow;
+                ctx.fill();
+
+                // 行星本体
+                ctx.beginPath();
+                ctx.arc(x, y, planet.size, 0, Math.PI * 2);
+                ctx.fillStyle = planet.color;
+                ctx.fill();
+
+                // 土星环
+                if (planet.ring) {
+                    ctx.beginPath();
+                    ctx.ellipse(x, y, planet.size * 2, planet.size * 0.5, Math.PI * 0.1, 0, Math.PI * 2);
+                    ctx.strokeStyle = 'rgba(244, 213, 158, 0.5)';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                }
+            });
+        }
+
+        // 绘制星空背景
+        const stars = [];
+        function initStars() {
+            for (let i = 0; i < 100; i++) {
+                stars.push({
+                    x: Math.random(),
+                    y: Math.random(),
+                    size: Math.random() * 1.5 + 0.5,
+                    alpha: Math.random() * 0.5 + 0.3
+                });
+            }
+        }
+        initStars();
+
+        function drawStars() {
+            stars.forEach(star => {
+                ctx.beginPath();
+                ctx.arc(star.x * canvas.width, star.y * canvas.height, star.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`;
+                ctx.fill();
+            });
+        }
+
+        // 动画循环
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawStars();
+            drawOrbits();
+            drawSun();
+            drawPlanets();
+            time += 1;
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        // 4秒后跳转
+        const intro = document.getElementById('intro');
         setTimeout(() => {
             intro.classList.add('fade-out');
             setTimeout(() => {
                 window.location.href = '/tasks.html';
-            }, 600);
-        }, 3000);
+            }, 800);
+        }, 4000);
     </script>
 </body>
 </html>
