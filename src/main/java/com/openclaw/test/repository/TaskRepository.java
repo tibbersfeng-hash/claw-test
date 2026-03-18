@@ -41,4 +41,17 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     Page<Task> findByCreatorStartingWithAndHandlerStartingWith(String creatorType, String handlerType, Pageable pageable);
 
     Page<Task> findByStatusAndCreatorStartingWithAndHandlerStartingWith(TaskStatus status, String creatorType, String handlerType, Pageable pageable);
+
+    // 新增：支持 creatorType 筛选的组合查询
+    Page<Task> findByTaskTypeAndCreatorStartingWith(TaskType taskType, String creatorType, Pageable pageable);
+
+    Page<Task> findByAssigneeRoleAndCreatorStartingWith(String assigneeRole, String creatorType, Pageable pageable);
+
+    Page<Task> findByStatusAndTaskTypeAndCreatorStartingWith(TaskStatus status, TaskType taskType, String creatorType, Pageable pageable);
+
+    Page<Task> findByStatusAndAssigneeRoleAndCreatorStartingWith(TaskStatus status, String assigneeRole, String creatorType, Pageable pageable);
+
+    Page<Task> findByTaskTypeAndAssigneeRoleAndCreatorStartingWith(TaskType taskType, String assigneeRole, String creatorType, Pageable pageable);
+
+    Page<Task> findByStatusAndTaskTypeAndAssigneeRoleAndCreatorStartingWith(TaskStatus status, TaskType taskType, String assigneeRole, String creatorType, Pageable pageable);
 }

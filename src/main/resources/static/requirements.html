@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>需求文档管理</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; min-height: 100vh; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #333; margin-bottom: 20px; text-align: center; }
+        .nav { margin-bottom: 20px; text-align: center; }
+        .nav a { color: #4a90d9; text-decoration: none; margin: 0 10px; }
+        .nav a:hover { text-decoration: underline; }
+        .card { background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 20px; margin-bottom: 20px; }
+        .card-title { font-size: 18px; font-weight: 600; color: #333; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; color: #666; font-size: 14px; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; transition: border-color 0.2s; }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: #4a90d9; }
+        .form-group textarea { resize: vertical; min-height: 150px; }
+        .form-row { display: flex; gap: 15px; }
+        .form-row .form-group { flex: 1; }
+        .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+        .btn-primary { background: #4a90d9; color: white; }
+        .btn-primary:hover { background: #357abd; }
+        .btn-success { background: #52c41a; color: white; }
+        .btn-success:hover { background: #389e0d; }
+        .btn-warning { background: #fa8c16; color: white; }
+        .btn-warning:hover { background: #d46b08; }
+        .btn-danger { background: #ff4d4f; color: white; }
+        .btn-danger:hover { background: #d9363e; }
+        .btn-info { background: #722ed1; color: white; }
+        .btn-info:hover { background: #531dab; }
+        .btn-secondary { background: #8c8c8c; color: white; }
+        .btn-secondary:hover { background: #595959; }
+        .btn-sm { padding: 6px 12px; font-size: 12px; }
+        .filter-bar { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; margin-bottom: 15px; }
+        .filter-bar select, .filter-bar input { padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+        .req-list { list-style: none; }
+        .req-item { padding: 15px; border: 1px solid #eee; border-radius: 6px; margin-bottom: 10px; }
+        .req-item:hover { border-color: #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .req-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+        .req-title { font-size: 16px; font-weight: 600; color: #333; flex: 1; }
+        .req-number { font-size: 14px; color: #4a90d9; margin-right: 10px; font-family: monospace; }
+        .req-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+        .req-meta { display: flex; gap: 15px; font-size: 12px; color: #999; margin-bottom: 10px; flex-wrap: wrap; }
+        .req-content { font-size: 14px; color: #666; background: #f9f9f9; padding: 10px; border-radius: 4px; margin-top: 10px; white-space: pre-wrap; word-break: break-word; max-height: 150px; overflow: hidden; }
+        .req-actions { margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; }
+        .status { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+        .status-DRAFT { background: #f5f5f5; color: #8c8c8c; }
+        .status-SUBMITTED { background: #e6f7ff; color: #1890ff; }
+        .status-APPROVED { background: #f6ffed; color: #52c41a; }
+        .status-REJECTED { background: #fff1f0; color: #f5222d; }
+        .pagination { display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
+        .pagination button { padding: 8px 15px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; }
+        .pagination button:hover:not(:disabled) { background: #f5f5f5; }
+        .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .pagination .page-info { padding: 8px 15px; color: #666; }
+        .empty-state { text-align: center; padding: 40px; color: #999; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; padding: 20px; border-radius: 8px; width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto; }
+        .modal-content.large { max-width: 900px; }
+        .modal-header { font-size: 18px; font-weight: 600; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .modal-close { font-size: 24px; cursor: pointer; color: #999; }
+        .modal-close:hover { color: #333; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+        .btn-cancel { background: #f5f5f5; color: #666; }
+        .btn-cancel:hover { background: #e8e8e8; }
+        .toast { position: fixed; top: 20px; right: 20px; padding: 12px 20px; background: #52c41a; color: white; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transform: translateX(120%); transition: transform 0.3s; z-index: 1001; }
+        .toast.show { transform: translateX(0); }
+        .toast.error { background: #ff4d4f; }
+        .api-key-section { background: #e6f7ff; padding: 15px; border-radius: 6px; margin-bottom: 20px; }
+        .api-key-section label { font-weight: 600; color: #1890ff; }
+        .api-key-section input { margin-top: 8px; }
+        .api-key-hint { font-size: 12px; color: #666; margin-top: 5px; }
+        .history-item { padding: 12px; border-left: 3px solid #4a90d9; margin-left: 15px; margin-bottom: 10px; background: #fafafa; }
+        .history-item .history-meta { font-size: 12px; color: #999; margin-bottom: 5px; }
+        .history-item .history-content { font-size: 13px; color: #666; max-height: 100px; overflow: hidden; }
+        .op-type { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; margin-right: 8px; }
+        .op-CREATE { background: #f6ffed; color: #52c41a; }
+        .op-UPDATE { background: #fff7e6; color: #fa8c16; }
+        .op-SUBMIT { background: #e6f7ff; color: #1890ff; }
+        .op-APPROVE { background: #f6ffed; color: #52c41a; }
+        .op-REJECT { background: #fff1f0; color: #f5222d; }
+        .version-tag { background: #f0f5ff; color: #2f54eb; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📄 需求文档管理</h1>
+        <div class="nav">
+            <a href="/tasks.html">任务管理</a>
+            <a href="/identities.html">身份管理</a>
+            <a href="/projects.html">项目管理</a>
+            <a href="/design-docs.html">设计文档</a>
+            <a href="/requirements.html">需求文档</a>
+        </div>
+
+        <!-- API Key 认证 -->
+        <div class="api-key-section">
+            <label for="apiKey">🔑 API Key 认证</label>
+            <input type="text" id="apiKey" placeholder="请输入 API Key (从身份管理页面获取)" value="">
+            <div class="api-key-hint">提示：需要 PM 角色的 API Key 才能创建和修改需求文档</div>
+        </div>
+
+        <!-- 创建需求 -->
+        <div class="card">
+            <div class="card-title">创建需求文档</div>
+            <form id="createForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="requirementNumber">需求编号（可选，不填自动生成）</label>
+                        <input type="text" id="requirementNumber" placeholder="如：REQ-2024-001" maxlength="50">
+                    </div>
+                    <div class="form-group">
+                        <label for="title">需求标题 *</label>
+                        <input type="text" id="title" placeholder="请输入需求标题" required maxlength="200">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="content">需求内容 *</label>
+                    <textarea id="content" placeholder="请详细描述需求内容..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">创建需求</button>
+            </form>
+        </div>
+
+        <!-- 需求列表 -->
+        <div class="card">
+            <div class="card-title">需求列表</div>
+            <div class="filter-bar">
+                <label>状态：</label>
+                <select id="statusFilter">
+                    <option value="">全部</option>
+                    <option value="DRAFT">草稿</option>
+                    <option value="SUBMITTED">已提交</option>
+                    <option value="APPROVED">已审批</option>
+                    <option value="REJECTED">已拒绝</option>
+                </select>
+                <label style="margin-left: 15px;">关键词：</label>
+                <input type="text" id="keywordFilter" placeholder="搜索标题">
+                <button class="btn btn-primary btn-sm" style="margin-left: 15px;" onclick="searchRequirements()">🔍 查询</button>
+            </div>
+            <ul class="req-list" id="reqList"></ul>
+            <div class="pagination" id="pagination"></div>
+        </div>
+    </div>
+
+    <!-- 编辑需求模态框 -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">修改需求文档</div>
+            <div class="form-group">
+                <label for="editTitle">需求标题</label>
+                <input type="text" id="editTitle" maxlength="200">
+            </div>
+            <div class="form-group">
+                <label for="editContent">需求内容</label>
+                <textarea id="editContent"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="editRemark">修改备注</label>
+                <input type="text" id="editRemark" placeholder="请说明修改原因" maxlength="500">
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="closeEditModal()">取消</button>
+                <button class="btn btn-primary" onclick="confirmEdit()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 拒绝需求模态框 -->
+    <div class="modal" id="rejectModal">
+        <div class="modal-content">
+            <div class="modal-header">拒绝需求</div>
+            <div class="form-group">
+                <label for="rejectRemark">拒绝原因</label>
+                <textarea id="rejectRemark" placeholder="请说明拒绝原因"></textarea>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="closeRejectModal()">取消</button>
+                <button class="btn btn-danger" onclick="confirmReject()">确认拒绝</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 删除需求模态框 -->
+    <div class="modal" id="deleteModal">
+        <div class="modal-content">
+            <div class="modal-header">确认删除</div>
+            <p>确定要删除该需求文档吗？此操作不可恢复。</p>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="closeDeleteModal()">取消</button>
+                <button class="btn btn-danger" onclick="confirmDelete()">确认删除</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 历史记录模态框 -->
+    <div class="modal" id="historyModal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <span>📜 修改历史</span>
+                <span class="modal-close" onclick="closeHistoryModal()">&times;</span>
+            </div>
+            <div id="historyContent"></div>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="closeHistoryModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 需求详情模态框 -->
+    <div class="modal" id="detailModal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <span id="detailTitle">需求详情</span>
+                <span class="modal-close" onclick="closeDetailModal()">&times;</span>
+            </div>
+            <div class="req-meta" id="detailMeta"></div>
+            <div class="form-group">
+                <label>需求内容</label>
+                <div class="req-content" id="detailContent" style="max-height: 400px;"></div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="closeDetailModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const API_BASE = '/api/requirements';
+        let currentPage = 0;
+        let currentReqId = null;
+
+        const STATUS_MAP = {
+            'DRAFT': '草稿',
+            'SUBMITTED': '已提交',
+            'APPROVED': '已审批',
+            'REJECTED': '已拒绝'
+        };
+
+        const OP_MAP = {
+            'CREATE': '创建',
+            'UPDATE': '修改',
+            'SUBMIT': '提交',
+            'APPROVE': '审批',
+            'REJECT': '拒绝'
+        };
+
+        function getApiKey() { return document.getElementById('apiKey').value.trim(); }
+
+        function getHeaders() {
+            const apiKey = getApiKey();
+            const headers = { 'Content-Type': 'application/json' };
+            if (apiKey) headers['X-API-Key'] = apiKey;
+            return headers;
+        }
+
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show' + (isError ? ' error' : '');
+            setTimeout(() => { toast.className = 'toast'; }, 3000);
+        }
+
+        async function loadRequirements() {
+            const statusFilter = document.getElementById('statusFilter').value;
+            const keywordFilter = document.getElementById('keywordFilter').value.trim();
+            let url = `${API_BASE}?page=${currentPage}&size=10`;
+            if (statusFilter) url += `&status=${statusFilter}`;
+            if (keywordFilter) url += `&keyword=${encodeURIComponent(keywordFilter)}`;
+
+            try {
+                const response = await fetch(url, { headers: getHeaders() });
+                if (response.status === 401) { showToast('请先输入有效的 API Key', true); return; }
+                const data = await response.json();
+                renderRequirements(data.content);
+                renderPagination(data.totalElements, data.totalPages, data.number);
+            } catch (error) { showToast('加载需求列表失败', true); }
+        }
+
+        function renderRequirements(requirements) {
+            const reqList = document.getElementById('reqList');
+            if (requirements.length === 0) { reqList.innerHTML = '<div class="empty-state">暂无需求文档</div>'; return; }
+            reqList.innerHTML = requirements.map(req => `
+                <li class="req-item">
+                    <div class="req-header">
+                        <div>
+                            <span class="req-number">${escapeHtml(req.requirementNumber)}</span>
+                            <span class="req-title">${escapeHtml(req.title)}</span>
+                        </div>
+                        <div class="req-badges">
+                            <span class="status status-${req.status}">${STATUS_MAP[req.status]}</span>
+                            <span class="version-tag">v${req.version}</span>
+                        </div>
+                    </div>
+                    <div class="req-meta">
+                        <span>👤 ${escapeHtml(req.creator)}</span>
+                        <span>📅 ${formatDate(req.createdAt)}</span>
+                        <span>✏️ 更新于 ${formatDate(req.updatedAt)}</span>
+                    </div>
+                    <div class="req-content">${escapeHtml(req.content.substring(0, 300))}${req.content.length > 300 ? '...' : ''}</div>
+                    <div class="req-actions">
+                        <button class="btn btn-info btn-sm" onclick="viewDetail(${req.id})">查看详情</button>
+                        <button class="btn btn-secondary btn-sm" onclick="viewHistory(${req.id})">历史记录</button>
+                        ${req.status === 'DRAFT' || req.status === 'REJECTED' ? `<button class="btn btn-warning btn-sm" onclick="openEditModal(${req.id}, ${escapeJsString(req.title)}, ${escapeJsString(req.content)})">修改</button>` : ''}
+                        ${req.status === 'DRAFT' || req.status === 'REJECTED' ? `<button class="btn btn-primary btn-sm" onclick="submitRequirement(${req.id})">提交</button>` : ''}
+                        ${req.status === 'SUBMITTED' ? `<button class="btn btn-success btn-sm" onclick="approveRequirement(${req.id})">审批通过</button>` : ''}
+                        ${req.status === 'SUBMITTED' ? `<button class="btn btn-danger btn-sm" onclick="openRejectModal(${req.id})">拒绝</button>` : ''}
+                        ${req.status !== 'APPROVED' ? `<button class="btn btn-danger btn-sm" onclick="openDeleteModal(${req.id})">删除</button>` : ''}
+                    </div>
+                </li>
+            `).join('');
+        }
+
+        function renderPagination(total, pages, current) {
+            const pagination = document.getElementById('pagination');
+            if (pages <= 1) { pagination.innerHTML = ''; return; }
+            pagination.innerHTML = `
+                <button onclick="goToPage(${current - 1})" ${current === 0 ? 'disabled' : ''}>上一页</button>
+                <span class="page-info">第 ${current + 1} / ${pages} 页 (共 ${total} 条)</span>
+                <button onclick="goToPage(${current + 1})" ${current >= pages - 1 ? 'disabled' : ''}>下一页</button>
+            `;
+        }
+
+        function goToPage(page) { currentPage = page; loadRequirements(); }
+        function searchRequirements() { currentPage = 0; loadRequirements(); }
+
+        function formatDate(dateStr) { if (!dateStr) return ''; return new Date(dateStr).toLocaleString('zh-CN'); }
+        function escapeHtml(text) { if (!text) return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+        function escapeJsString(text) { if (!text) return "''"; return "'" + text.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\n/g, '\\n').replace(/\r/g, '\\r') + "'"; }
+
+        // 创建需求
+        document.getElementById('createForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('title').value.trim();
+            const content = document.getElementById('content').value.trim();
+            const requirementNumber = document.getElementById('requirementNumber').value.trim();
+
+            if (!title || !content) { showToast('请填写标题和内容', true); return; }
+            if (!getApiKey()) { showToast('请先输入 API Key', true); return; }
+
+            try {
+                const body = { title, content };
+                if (requirementNumber) body.requirementNumber = requirementNumber;
+
+                const response = await fetch(API_BASE, {
+                    method: 'POST',
+                    headers: getHeaders(),
+                    body: JSON.stringify(body)
+                });
+                if (response.ok) {
+                    showToast('需求创建成功');
+                    document.getElementById('createForm').reset();
+                    currentPage = 0;
+                    loadRequirements();
+                } else {
+                    const error = await response.json();
+                    showToast(error.message || '创建失败', true);
+                }
+            } catch (error) { showToast('创建需求失败', true); }
+        });
+
+        // 筛选器事件
+        document.getElementById('statusFilter').addEventListener('change', searchRequirements);
+
+        // 查看详情
+        async function viewDetail(id) {
+            try {
+                const response = await fetch(`${API_BASE}/${id}`, { headers: getHeaders() });
+                if (response.ok) {
+                    const req = await response.json();
+                    document.getElementById('detailTitle').textContent = req.requirementNumber + ' - ' + req.title;
+                    document.getElementById('detailMeta').innerHTML = `
+                        <span>👤 ${escapeHtml(req.creator)}</span>
+                        <span class="status status-${req.status}">${STATUS_MAP[req.status]}</span>
+                        <span class="version-tag">v${req.version}</span>
+                        <span>📅 创建于 ${formatDate(req.createdAt)}</span>
+                    `;
+                    document.getElementById('detailContent').textContent = req.content;
+                    document.getElementById('detailModal').classList.add('active');
+                }
+            } catch (error) { showToast('获取详情失败', true); }
+        }
+        function closeDetailModal() { document.getElementById('detailModal').classList.remove('active'); }
+
+        // 历史记录
+        async function viewHistory(id) {
+            document.getElementById('historyModal').classList.add('active');
+            const historyContent = document.getElementById('historyContent');
+            historyContent.innerHTML = '<div class="empty-state">加载中...</div>';
+            try {
+                const response = await fetch(`${API_BASE}/${id}/history`, { headers: getHeaders() });
+                const history = await response.json();
+                if (history.length === 0) {
+                    historyContent.innerHTML = '<div class="empty-state">暂无历史记录</div>';
+                    return;
+                }
+                historyContent.innerHTML = history.map(h => `
+                    <div class="history-item">
+                        <div class="history-meta">
+                            <span class="op-type op-${h.operationType}">${OP_MAP[h.operationType] || h.operationType}</span>
+                            <span class="version-tag">v${h.version}</span>
+                            <span>👤 ${escapeHtml(h.operator)}</span>
+                            <span>📅 ${formatDate(h.createdAt)}</span>
+                        </div>
+                        ${h.remark ? `<div style="color: #666; margin-bottom: 5px;">备注: ${escapeHtml(h.remark)}</div>` : ''}
+                        <div class="history-content">${escapeHtml(h.content.substring(0, 200))}${h.content.length > 200 ? '...' : ''}</div>
+                    </div>
+                `).join('');
+            } catch (error) { historyContent.innerHTML = '<div class="empty-state">加载失败</div>'; }
+        }
+        function closeHistoryModal() { document.getElementById('historyModal').classList.remove('active'); }
+
+        // 编辑需求
+        function openEditModal(id, title, content) {
+            currentReqId = id;
+            document.getElementById('editTitle').value = title || '';
+            document.getElementById('editContent').value = content || '';
+            document.getElementById('editRemark').value = '';
+            document.getElementById('editModal').classList.add('active');
+        }
+        function closeEditModal() { document.getElementById('editModal').classList.remove('active'); currentReqId = null; }
+
+        async function confirmEdit() {
+            if (!currentReqId) return;
+            const title = document.getElementById('editTitle').value.trim();
+            const content = document.getElementById('editContent').value.trim();
+            const remark = document.getElementById('editRemark').value.trim();
+            if (!title || !content) { showToast('标题和内容不能为空', true); return; }
+            try {
+                const response = await fetch(`${API_BASE}/${currentReqId}`, {
+                    method: 'PUT',
+                    headers: getHeaders(),
+                    body: JSON.stringify({ title, content, remark })
+                });
+                if (response.ok) { showToast('需求已修改'); closeEditModal(); loadRequirements(); }
+                else { const error = await response.json(); showToast(error.message || '操作失败', true); }
+            } catch (error) { showToast('操作失败', true); }
+        }
+
+        // 提交需求
+        async function submitRequirement(id) {
+            if (!confirm('确定要提交该需求吗？')) return;
+            try {
+                const response = await fetch(`${API_BASE}/${id}/submit`, {
+                    method: 'PUT',
+                    headers: getHeaders()
+                });
+                if (response.ok) { showToast('需求已提交'); loadRequirements(); }
+                else { const error = await response.json(); showToast(error.message || '操作失败', true); }
+            } catch (error) { showToast('操作失败', true); }
+        }
+
+        // 审批通过
+        async function approveRequirement(id) {
+            if (!confirm('确定要审批通过该需求吗？')) return;
+            try {
+                const response = await fetch(`${API_BASE}/${id}/approve`, {
+                    method: 'PUT',
+                    headers: getHeaders()
+                });
+                if (response.ok) { showToast('需求已审批通过'); loadRequirements(); }
+                else { const error = await response.json(); showToast(error.message || '操作失败', true); }
+            } catch (error) { showToast('操作失败', true); }
+        }
+
+        // 拒绝需求
+        function openRejectModal(id) {
+            currentReqId = id;
+            document.getElementById('rejectRemark').value = '';
+            document.getElementById('rejectModal').classList.add('active');
+        }
+        function closeRejectModal() { document.getElementById('rejectModal').classList.remove('active'); currentReqId = null; }
+
+        async function confirmReject() {
+            if (!currentReqId) return;
+            const remark = document.getElementById('rejectRemark').value.trim();
+            try {
+                const response = await fetch(`${API_BASE}/${currentReqId}/reject`, {
+                    method: 'PUT',
+                    headers: getHeaders(),
+                    body: JSON.stringify({ remark })
+                });
+                if (response.ok) { showToast('需求已拒绝'); closeRejectModal(); loadRequirements(); }
+                else { const error = await response.json(); showToast(error.message || '操作失败', true); }
+            } catch (error) { showToast('操作失败', true); }
+        }
+
+        // 删除需求
+        function openDeleteModal(id) {
+            currentReqId = id;
+            document.getElementById('deleteModal').classList.add('active');
+        }
+        function closeDeleteModal() { document.getElementById('deleteModal').classList.remove('active'); currentReqId = null; }
+
+        async function confirmDelete() {
+            if (!currentReqId) return;
+            try {
+                const response = await fetch(`${API_BASE}/${currentReqId}`, {
+                    method: 'DELETE',
+                    headers: getHeaders()
+                });
+                if (response.ok) { showToast('需求已删除'); closeDeleteModal(); loadRequirements(); }
+                else { const error = await response.json(); showToast(error.message || '删除失败', true); }
+            } catch (error) { showToast('删除失败', true); }
+        }
+
+        loadRequirements();
+    </script>
+</body>
+</html>

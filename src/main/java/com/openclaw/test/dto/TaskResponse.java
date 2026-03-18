@@ -18,6 +18,8 @@ public class TaskResponse {
     private TaskType taskType;
     private String taskTypeDisplay;
     private Long parentId;
+    private Long requirementId;
+    private String requirementTitle;
     private String assigneeRole;
     private Integer priority;
     private String tags;
@@ -40,6 +42,7 @@ public class TaskResponse {
             response.setTaskTypeDisplay(task.getTaskType().getDisplayName());
         }
         response.setParentId(task.getParentId());
+        response.setRequirementId(task.getRequirementId());
         response.setAssigneeRole(task.getAssigneeRole());
         response.setPriority(task.getPriority());
         response.setTags(task.getTags());
@@ -129,6 +132,22 @@ public class TaskResponse {
 
     public void setParentId(Long parentId) {
         this.parentId = parentId;
+    }
+
+    public Long getRequirementId() {
+        return requirementId;
+    }
+
+    public void setRequirementId(Long requirementId) {
+        this.requirementId = requirementId;
+    }
+
+    public String getRequirementTitle() {
+        return requirementTitle;
+    }
+
+    public void setRequirementTitle(String requirementTitle) {
+        this.requirementTitle = requirementTitle;
     }
 
     public String getAssigneeRole() {

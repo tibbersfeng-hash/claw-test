@@ -8,6 +8,7 @@ import com.openclaw.test.entity.*;
 import com.openclaw.test.exception.TaskNotFoundException;
 import com.openclaw.test.repository.IdentityRepository;
 import com.openclaw.test.repository.ProjectRepository;
+import com.openclaw.test.repository.RequirementRepository;
 import com.openclaw.test.repository.TaskRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,12 +31,14 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final IdentityRepository identityRepository;
     private final ProjectRepository projectRepository;
+    private final RequirementRepository requirementRepository;
     private final DesignDocService designDocService;
 
-    public TaskService(TaskRepository taskRepository, IdentityRepository identityRepository, ProjectRepository projectRepository, DesignDocService designDocService) {
+    public TaskService(TaskRepository taskRepository, IdentityRepository identityRepository, ProjectRepository projectRepository, RequirementRepository requirementRepository, DesignDocService designDocService) {
         this.taskRepository = taskRepository;
         this.identityRepository = identityRepository;
         this.projectRepository = projectRepository;
+        this.requirementRepository = requirementRepository;
         this.designDocService = designDocService;
     }
 
@@ -53,6 +56,11 @@ public class TaskService {
         // 设置父任务
         if (request.getParentId() != null) {
             task.setParentId(request.getParentId());
+        }
+
+        // 设置关联需求文档
+        if (request.getRequirementId() != null) {
+            task.setRequirementId(request.getRequirementId());
         }
 
         // 设置执行者角色
@@ -113,15 +121,42 @@ public class TaskService {
             projectRepository.findById(response.getProjectId())
                     .ifPresent(project -> response.setProjectName(project.getName()));
         }
+        return fillRequirementTitle(response);
+    }
+
+    private TaskResponse fillRequirementTitle(TaskResponse response) {
+        if (response.getRequirementId() != null) {
+            requirementRepository.findById(response.getRequirementId())
+                    .ifPresent(requirement -> response.setRequirementTitle(requirement.getTitle()));
+        }
         return response;
     }
 
-    public Page<TaskResponse> getTasks(int page, int size, TaskStatus status, TaskType taskType, String assigneeRole) {
+    public Page<TaskResponse> getTasks(int page, int size, TaskStatus status, TaskType taskType, String assigneeRole, String creatorType) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         Page<Task> taskPage;
 
-        if (status != null && taskType != null && assigneeRole != null) {
+        // 按 creatorType 筛选（creator 字段格式为 "PM-1"、"DEV-2" 等）
+        boolean hasCreatorType = creatorType != null && !creatorType.isEmpty();
+
+        if (status != null && taskType != null && assigneeRole != null && hasCreatorType) {
+            taskPage = taskRepository.findByStatusAndTaskTypeAndAssigneeRoleAndCreatorStartingWith(status, taskType, assigneeRole, creatorType, pageable);
+        } else if (status != null && taskType != null && hasCreatorType) {
+            taskPage = taskRepository.findByStatusAndTaskTypeAndCreatorStartingWith(status, taskType, creatorType, pageable);
+        } else if (status != null && assigneeRole != null && hasCreatorType) {
+            taskPage = taskRepository.findByStatusAndAssigneeRoleAndCreatorStartingWith(status, assigneeRole, creatorType, pageable);
+        } else if (taskType != null && assigneeRole != null && hasCreatorType) {
+            taskPage = taskRepository.findByTaskTypeAndAssigneeRoleAndCreatorStartingWith(taskType, assigneeRole, creatorType, pageable);
+        } else if (status != null && hasCreatorType) {
+            taskPage = taskRepository.findByStatusAndCreatorStartingWith(status, creatorType, pageable);
+        } else if (taskType != null && hasCreatorType) {
+            taskPage = taskRepository.findByTaskTypeAndCreatorStartingWith(taskType, creatorType, pageable);
+        } else if (assigneeRole != null && hasCreatorType) {
+            taskPage = taskRepository.findByAssigneeRoleAndCreatorStartingWith(assigneeRole, creatorType, pageable);
+        } else if (hasCreatorType) {
+            taskPage = taskRepository.findByCreatorStartingWith(creatorType, pageable);
+        } else if (status != null && taskType != null && assigneeRole != null) {
             taskPage = taskRepository.findByStatusAndTaskTypeAndAssigneeRole(status, taskType, assigneeRole, pageable);
         } else if (status != null && taskType != null) {
             taskPage = taskRepository.findByStatusAndTaskType(status, taskType, pageable);

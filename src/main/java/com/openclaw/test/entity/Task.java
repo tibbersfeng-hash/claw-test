@@ -32,6 +32,8 @@ public class Task {
 
     private Long parentId;
 
+    private Long requirementId;
+
     @Column(length = 20)
     private String assigneeRole;
 
@@ -136,6 +138,14 @@ public class Task {
 
     public void setParentId(Long parentId) {
         this.parentId = parentId;
+    }
+
+    public Long getRequirementId() {
+        return requirementId;
+    }
+
+    public void setRequirementId(Long requirementId) {
+        this.requirementId = requirementId;
     }
 
     public String getAssigneeRole() {

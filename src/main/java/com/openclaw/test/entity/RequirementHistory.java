@@ -4,12 +4,18 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "design_docs")
-public class DesignDoc {
+@Table(name = "requirement_histories")
+public class RequirementHistory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
+    private Long requirementId;
+
+    @Column(nullable = false)
+    private Integer version;
 
     @Column(nullable = false, length = 200)
     private String title;
@@ -17,28 +23,21 @@ public class DesignDoc {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    @Column(nullable = false, length = 50)
+    private String operationType;
+
     @Column(nullable = false, length = 100)
-    private String creator;
+    private String operator;
 
-    private Long taskId;
-
-    private Long requirementId;
+    @Column(length = 500)
+    private String remark;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
-
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
     }
 
     // Getters and Setters
@@ -48,6 +47,22 @@ public class DesignDoc {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getRequirementId() {
+        return requirementId;
+    }
+
+    public void setRequirementId(Long requirementId) {
+        this.requirementId = requirementId;
+    }
+
+    public Integer getVersion() {
+        return version;
+    }
+
+    public void setVersion(Integer version) {
+        this.version = version;
     }
 
     public String getTitle() {
@@ -66,28 +81,28 @@ public class DesignDoc {
         this.content = content;
     }
 
-    public String getCreator() {
-        return creator;
+    public String getOperationType() {
+        return operationType;
     }
 
-    public void setCreator(String creator) {
-        this.creator = creator;
+    public void setOperationType(String operationType) {
+        this.operationType = operationType;
     }
 
-    public Long getTaskId() {
-        return taskId;
+    public String getOperator() {
+        return operator;
     }
 
-    public void setTaskId(Long taskId) {
-        this.taskId = taskId;
+    public void setOperator(String operator) {
+        this.operator = operator;
     }
 
-    public Long getRequirementId() {
-        return requirementId;
+    public String getRemark() {
+        return remark;
     }
 
-    public void setRequirementId(Long requirementId) {
-        this.requirementId = requirementId;
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -96,13 +111,5 @@ public class DesignDoc {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
     }
 }

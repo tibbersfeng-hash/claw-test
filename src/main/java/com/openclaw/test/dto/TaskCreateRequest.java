@@ -26,6 +26,8 @@ public class TaskCreateRequest {
 
     private String extraData;
 
+    private Long requirementId;
+
     public String getContent() {
         return content;
     }
@@ -96,5 +98,13 @@ public class TaskCreateRequest {
 
     public void setExtraData(String extraData) {
         this.extraData = extraData;
+    }
+
+    public Long getRequirementId() {
+        return requirementId;
+    }
+
+    public void setRequirementId(Long requirementId) {
+        this.requirementId = requirementId;
     }
 }

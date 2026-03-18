@@ -111,6 +111,7 @@
             <a href="/identities.html">身份管理</a>
             <a href="/projects.html">项目管理</a>
             <a href="/design-docs.html">设计文档</a>
+            <a href="/requirements.html">需求文档</a>
         </div>
 
         <!-- API Key 认证 -->
@@ -150,6 +151,12 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group">
+                        <label for="requirementId">关联需求文档</label>
+                        <select id="requirementId">
+                            <option value="">无</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label for="assigneeRole">执行者角色</label>
                         <select id="assigneeRole">
                             <option value="">自动分配</option>
@@ -160,10 +167,10 @@
                             <option value="OPS">OPS - 运维工程师</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label for="priority">优先级 (0-10)</label>
-                        <input type="number" id="priority" min="0" max="10" value="0" placeholder="数字越大优先级越高">
-                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="priority">优先级 (0-10)</label>
+                    <input type="number" id="priority" min="0" max="10" value="0" placeholder="数字越大优先级越高">
                 </div>
                 <div class="form-group">
                     <label for="imageUrls">图片链接 (多个用逗号分隔)</label>
@@ -177,7 +184,15 @@
         <div class="card">
             <div class="card-title">任务列表</div>
             <div class="filter-bar">
-                <label>状态：</label>
+                <label>创建者：</label>
+                <select id="creatorTypeFilter">
+                    <option value="PM" selected>PM - 产品经理</option>
+                    <option value="OPS">OPS - 运维</option>
+                    <option value="DEV">DEV - 开发</option>
+                    <option value="QA">QA - 测试</option>
+                    <option value="">全部</option>
+                </select>
+                <label style="margin-left: 15px;">状态：</label>
                 <select id="statusFilter">
                     <option value="">全部</option>
                     <option value="PENDING">待处理</option>
@@ -206,6 +221,7 @@
                     <option value="QA">QA</option>
                     <option value="OPS">OPS</option>
                 </select>
+                <button class="btn btn-primary btn-sm" style="margin-left: 15px;" onclick="searchTasks()">🔍 查询</button>
             </div>
             <ul class="task-list" id="taskList"></ul>
             <div class="pagination" id="pagination"></div>
@@ -364,16 +380,17 @@
         }
 
         async function loadTasks() {
+            const creatorTypeFilter = document.getElementById('creatorTypeFilter').value;
             const statusFilter = document.getElementById('statusFilter').value;
             const taskTypeFilter = document.getElementById('taskTypeFilter').value;
             const assigneeRoleFilter = document.getElementById('assigneeRoleFilter').value;
             currentStatus = statusFilter;
-            let url = `${API_BASE}?page=${currentPage}&size=10`;
+            let url = `${API_BASE}?page=${currentPage}&size=10&creatorType=${creatorTypeFilter}`;
             if (statusFilter) url += `&status=${statusFilter}`;
             if (taskTypeFilter) url += `&taskType=${taskTypeFilter}`;
             if (assigneeRoleFilter) url += `&assigneeRole=${assigneeRoleFilter}`;
             try {
-                const response = await fetch(url, { headers: getHeaders() });
+                const response = await fetch(url);
                 if (response.status === 401) { showToast('请先输入有效的 API Key', true); return; }
                 const data = await response.json();
                 renderTasks(data.content);
@@ -398,6 +415,7 @@
                         ${task.handler ? `<span>🔧 ${escapeHtml(task.handler)}${getIdentityTypeBadge(task.handler)}</span>` : ''}
                         ${task.assigneeRole ? `<span>📋 ${task.assigneeRole}</span>` : ''}
                         ${task.projectName ? `<span>📁 ${escapeHtml(task.projectName)}</span>` : ''}
+                        ${task.requirementTitle ? `<span>📄 ${escapeHtml(task.requirementTitle)}</span>` : ''}
                         ${task.priority > 0 ? `<span>⭐ P${task.priority}</span>` : ''}
                         <span>📅 ${formatDate(task.createdAt)}</span>
                     </div>
@@ -456,6 +474,8 @@
             try {
                 const body = { content, taskType };
                 if (projectId) body.projectId = parseInt(projectId);
+                const requirementId = document.getElementById('requirementId').value;
+                if (requirementId) body.requirementId = parseInt(requirementId);
                 if (assigneeRole) body.assigneeRole = assigneeRole;
                 if (priority) body.priority = parseInt(priority);
                 if (imageUrls) body.imageUrls = imageUrls;
@@ -477,10 +497,11 @@
             } catch (error) { showToast('创建任务失败', true); }
         });
 
-        // 筛选器事件
-        document.getElementById('statusFilter').addEventListener('change', () => { currentPage = 0; loadTasks(); });
-        document.getElementById('taskTypeFilter').addEventListener('change', () => { currentPage = 0; loadTasks(); });
-        document.getElementById('assigneeRoleFilter').addEventListener('change', () => { currentPage = 0; loadTasks(); });
+        // 查询按钮
+        function searchTasks() {
+            currentPage = 0;
+            loadTasks();
+        }
 
         // 编辑任务
         function openEditModal(taskId, content) {
@@ -718,7 +739,17 @@
             } catch (error) { console.error('加载项目列表失败'); }
         }
 
+        async function loadRequirements() {
+            try {
+                const response = await fetch('/api/requirements?size=100');
+                const data = await response.json();
+                const select = document.getElementById('requirementId');
+                select.innerHTML = '<option value="">无</option>' + data.content.map(r => `<option value="${r.id}">${escapeHtml(r.title)}</option>`).join('');
+            } catch (error) { console.error('加载需求文档列表失败'); }
+        }
+
         loadProjects();
+        loadRequirements();
         loadTasks();
     </script>
 </body>

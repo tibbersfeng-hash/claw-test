@@ -26,6 +26,11 @@ public class AuthInterceptor implements HandlerInterceptor {
             return true;
         }
 
+        // GET /api/tasks 不需要认证
+        if ("GET".equalsIgnoreCase(request.getMethod()) && "/api/tasks".equals(request.getRequestURI())) {
+            return true;
+        }
+
         String apiKey = request.getHeader(AUTH_HEADER);
 
         if (apiKey == null || apiKey.isEmpty()) {

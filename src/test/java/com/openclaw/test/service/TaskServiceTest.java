@@ -77,7 +77,7 @@ class TaskServiceTest {
         testTask.setId(1L);
         testTask.setContent("测试任务");
         testTask.setCreator("PM-1");
-        testTask.setStatus(TaskStatus.INIT);
+        testTask.setStatus(TaskStatus.PENDING);
         testTask.setProjectId(1L);
     }
 
@@ -160,7 +160,7 @@ class TaskServiceTest {
         when(projectRepository.findById(1L)).thenReturn(Optional.of(testProject));
 
         // Act
-        Page<TaskResponse> response = taskService.getTasks(0, 10, null, null, null);
+        Page<TaskResponse> response = taskService.getTasks(0, 10, null, null, null, null);
 
         // Assert
         assertThat(response.getContent()).hasSize(1);
@@ -171,15 +171,15 @@ class TaskServiceTest {
     void getTasks_WithStatusFilter() {
         // Arrange
         Page<Task> taskPage = new PageImpl<>(List.of(testTask));
-        when(taskRepository.findByStatus(eq(TaskStatus.INIT), any(Pageable.class))).thenReturn(taskPage);
+        when(taskRepository.findByStatus(eq(TaskStatus.PENDING), any(Pageable.class))).thenReturn(taskPage);
         when(projectRepository.findById(1L)).thenReturn(Optional.of(testProject));
 
         // Act
-        Page<TaskResponse> response = taskService.getTasks(0, 10, TaskStatus.INIT, null, null);
+        Page<TaskResponse> response = taskService.getTasks(0, 10, TaskStatus.PENDING, null, null, null);
 
         // Assert
         assertThat(response.getContent()).hasSize(1);
-        verify(taskRepository, times(1)).findByStatus(eq(TaskStatus.INIT), any(Pageable.class));
+        verify(taskRepository, times(1)).findByStatus(eq(TaskStatus.PENDING), any(Pageable.class));
     }
 
     @Test
@@ -270,12 +270,13 @@ class TaskServiceTest {
     }
 
     @Test
-    @DisplayName("完成任务 - DEV完成时创建QA测试任务和设计文档")
-    void completeTask_DEV_CreatesQaTask() {
+    @DisplayName("完成任务 - DEV完成时创建下一阶段任务")
+    void completeTask_DEV_CreatesNextTask() {
         // Arrange
+        testTask.setTaskType(com.openclaw.test.entity.TaskType.DEV);
         TaskCompleteRequest request = new TaskCompleteRequest();
         request.setRemark("完成备注");
-        request.setDesignContent("设计内容：模块拆解和实现方案");
+        request.setCreateNextTask(true);
 
         when(taskRepository.findById(1L)).thenReturn(Optional.of(testTask));
         when(taskRepository.save(any(Task.class))).thenAnswer(invocation -> {
@@ -291,20 +292,17 @@ class TaskServiceTest {
 
         // Assert
         assertThat(response.getStatus()).isEqualTo(TaskStatus.COMPLETED);
-        // 验证创建了两个任务：原始任务完成 + 新的QA任务
+        // 验证创建了两个任务：原始任务完成 + 新的TEST任务
         verify(taskRepository, times(2)).save(any(Task.class));
-        // 验证创建了设计文档
-        verify(designDocService, times(1)).createDocForTask(
-                eq(1L), eq("任务#1 设计文档"), eq("设计内容：模块拆解和实现方案"), eq("DEV-2"));
     }
 
     @Test
-    @DisplayName("完成任务 - DEV完成但无设计内容时不创建QA任务")
-    void completeTask_DEV_NoDesign_NoQaTask() {
+    @DisplayName("完成任务 - 不创建下一阶段任务")
+    void completeTask_NoNextTask() {
         // Arrange
         TaskCompleteRequest request = new TaskCompleteRequest();
         request.setRemark("完成备注");
-        // designContent 为空
+        request.setCreateNextTask(false);
 
         when(taskRepository.findById(1L)).thenReturn(Optional.of(testTask));
         when(taskRepository.save(any(Task.class))).thenReturn(testTask);
@@ -315,28 +313,7 @@ class TaskServiceTest {
 
         // Assert
         assertThat(response.getStatus()).isEqualTo(TaskStatus.COMPLETED);
-        // 只保存了原始任务，没有创建QA任务
-        verify(taskRepository, times(1)).save(any(Task.class));
-    }
-
-    @Test
-    @DisplayName("完成任务 - PM完成时不创建QA任务")
-    void completeTask_PM_NoQaTask() {
-        // Arrange
-        TaskCompleteRequest request = new TaskCompleteRequest();
-        request.setRemark("完成备注");
-        request.setDesignContent("设计内容");
-
-        when(taskRepository.findById(1L)).thenReturn(Optional.of(testTask));
-        when(taskRepository.save(any(Task.class))).thenReturn(testTask);
-        when(projectRepository.findById(1L)).thenReturn(Optional.of(testProject));
-
-        // Act
-        TaskResponse response = taskService.completeTask(1L, request, pmIdentity);
-
-        // Assert
-        assertThat(response.getStatus()).isEqualTo(TaskStatus.COMPLETED);
-        // 只保存了原始任务，没有创建QA任务
+        // 只保存了原始任务
         verify(taskRepository, times(1)).save(any(Task.class));
     }
 
