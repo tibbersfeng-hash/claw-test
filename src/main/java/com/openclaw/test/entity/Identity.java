@@ -18,6 +18,13 @@ public class Identity {
     @Column(nullable = false, unique = true, length = 64)
     private String apiKey;
 
+    /**
+     * 身份标识符，如 "PM-1", "DEV-3"
+     * 用于 Agent 间通信的身份认证
+     */
+    @Column(unique = true, length = 32)
+    private String identityId;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -26,6 +33,9 @@ public class Identity {
         createdAt = LocalDateTime.now();
         if (apiKey == null || apiKey.isEmpty()) {
             apiKey = generateApiKey();
+        }
+        if (identityId == null || identityId.isEmpty()) {
+            identityId = type.name() + "-" + id;
         }
     }
 
@@ -64,5 +74,13 @@ public class Identity {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getIdentityId() {
+        return identityId;
+    }
+
+    public void setIdentityId(String identityId) {
+        this.identityId = identityId;
     }
 }

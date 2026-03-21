@@ -19,4 +19,14 @@ public interface IdentityRepository extends JpaRepository<Identity, Long> {
     boolean existsByApiKey(String apiKey);
 
     Optional<Identity> findFirstByTypeOrderByIdAsc(IdentityType type);
+
+    /**
+     * 根据身份标识查找（如 "PM-1", "DEV-3"）
+     */
+    Identity findByIdentityId(String identityId);
+
+    /**
+     * 检查身份标识是否已存在
+     */
+    boolean existsByIdentityId(String identityId);
 }

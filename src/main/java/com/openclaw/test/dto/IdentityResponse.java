@@ -9,6 +9,7 @@ public class IdentityResponse {
 
     private Long id;
     private IdentityType type;
+    private String identityId;
     private String apiKey;
     private LocalDateTime createdAt;
 
@@ -16,6 +17,8 @@ public class IdentityResponse {
         IdentityResponse response = new IdentityResponse();
         response.setId(identity.getId());
         response.setType(identity.getType());
+        response.setIdentityId(identity.getIdentityId() != null ?
+            identity.getIdentityId() : identity.getType().name() + "-" + identity.getId());
         response.setApiKey(identity.getApiKey());
         response.setCreatedAt(identity.getCreatedAt());
         return response;
@@ -35,6 +38,14 @@ public class IdentityResponse {
 
     public void setType(IdentityType type) {
         this.type = type;
+    }
+
+    public String getIdentityId() {
+        return identityId;
+    }
+
+    public void setIdentityId(String identityId) {
+        this.identityId = identityId;
     }
 
     public String getApiKey() {

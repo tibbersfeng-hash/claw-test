@@ -47,6 +47,9 @@ public class DesignDocService {
     }
 
     private String getCreatorName(Identity identity) {
+        if (identity == null) {
+            return "SYSTEM";
+        }
         return identity.getType().name() + "-" + identity.getId();
     }
 
